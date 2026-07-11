@@ -59,12 +59,13 @@ function App() {
 
     if (allFilled(x0, v, t, xf)) {
       const prev = prevUnitsRef.current;
-      if (x0Unit !== prev.x0Unit) rawInput.x0 = '';
-      if (xfUnit !== prev.xfUnit) rawInput.xf = '';
-      if (timeUnit !== prev.timeUnit) rawInput.t = '';
-      if (velUnit !== prev.velUnit) rawInput.v = '';
+      let didClear = false;
+      if (x0Unit !== prev.x0Unit) { rawInput.x0 = ''; didClear = true; }
+      if (xfUnit !== prev.xfUnit) { rawInput.xf = ''; didClear = true; }
+      if (timeUnit !== prev.timeUnit) { rawInput.t = ''; didClear = true; }
+      if (velUnit !== prev.velUnit) { rawInput.v = ''; didClear = true; }
 
-      if (computedFieldRef.current) {
+      if (!didClear && computedFieldRef.current) {
         const cf = computedFieldRef.current;
         if (rawInput[cf.field!] === cf.value) {
           rawInput[cf.field!] = '';

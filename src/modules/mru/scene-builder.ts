@@ -1,5 +1,6 @@
 import type { SceneGraph } from '../../core/types.ts';
 import { formatValue } from '../../core/format.ts';
+import { toSI } from '../../core/units.ts';
 import type { MRUDiagramModel } from './types.ts';
 
 function labelText(
@@ -45,7 +46,7 @@ export function buildMRUScene(model: MRUDiagramModel): SceneGraph {
         type: 'position',
         visible: true,
         semanticRole: 'initial',
-        physicalValue: model.x0,
+        physicalValue: toSI(model.x0, model.x0Unit, 'distance'),
         showMarker: true,
         showLabel: true,
       },
@@ -54,7 +55,7 @@ export function buildMRUScene(model: MRUDiagramModel): SceneGraph {
         type: 'position',
         visible: true,
         semanticRole: 'final',
-        physicalValue: model.xf,
+        physicalValue: toSI(model.xf, model.xfUnit, 'distance'),
         showMarker: true,
         showLabel: true,
       },
@@ -112,8 +113,8 @@ export function buildMRUScene(model: MRUDiagramModel): SceneGraph {
         type: 'displacement-arrow',
         visible: model.hasDisplacement,
         orientation: model.direction,
-        physicalXi: model.x0,
-        physicalXf: model.xf,
+        physicalXi: toSI(model.x0, model.x0Unit, 'distance'),
+        physicalXf: toSI(model.xf, model.xfUnit, 'distance'),
       },
     ],
   };
