@@ -8,5 +8,5 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
-  base: "/generador-diagramas-fisica/",
+  base: "/app-generador-diagramas-fisica/",
 })
