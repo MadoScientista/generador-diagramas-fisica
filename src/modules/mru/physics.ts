@@ -49,6 +49,9 @@ export function resolveMRU(input: MRUSolveInput): MRUResolvedVars {
     } else {
       tSI = (xfSI - x0SI) / vSI;
     }
+    if (tSI < 0) {
+      throw new Error('El tiempo calculado es negativo. Verifique los valores ingresados.');
+    }
     computedField = 't';
   } else {
     x0SI = toSI(input.x0!, input.x0Unit, 'distance');

@@ -1,9 +1,7 @@
-interface ExportButtonProps {
-  svg: string | null;
-}
+import { useCallback } from 'react';
 
-export function ExportButton({ svg }: ExportButtonProps) {
-  const handleExport = () => {
+export function useExportSVG(svg: string | null) {
+  const exportSVG = useCallback(() => {
     if (!svg) return;
 
     const blob = new Blob([svg], { type: 'image/svg+xml' });
@@ -15,11 +13,7 @@ export function ExportButton({ svg }: ExportButtonProps) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  };
+  }, [svg]);
 
-  return (
-    <button onClick={handleExport} disabled={!svg} className="export-button">
-      Exportar
-    </button>
-  );
+  return { exportSVG, isReady: svg !== null };
 }

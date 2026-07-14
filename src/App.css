@@ -4,22 +4,33 @@
   padding: 0;
 }
 
-.app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+body {
   font-family: 'Inter', 'Roboto', sans-serif;
   color: #1a1a1a;
   background: #fafafa;
 }
 
-.app-header {
+/* ── Page Layout ─────────────────────────────────────── */
+
+.page-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-content {
+  flex: 1;
+}
+
+/* ── Site Header ─────────────────────────────────────── */
+
+.site-header {
   text-align: center;
   padding: 2rem 1rem 1rem;
   border-bottom: 1px solid #ddd;
 }
 
-.app-header h1 {
+.site-header h1 {
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -31,8 +42,97 @@
   margin-top: 0.25rem;
 }
 
-.app-main {
-  flex: 1;
+/* ── Navbar ──────────────────────────────────────────── */
+
+.navbar {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-bottom: 1px solid #ddd;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: #555;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.navbar a:hover {
+  background: #f0f0f0;
+  color: #1a1a1a;
+}
+
+.navbar a.active {
+  background: #2563eb;
+  color: white;
+}
+
+/* ── Site Footer ─────────────────────────────────────── */
+
+.site-footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border-top: 1px solid #ddd;
+  color: #888;
+  font-size: 0.8rem;
+}
+
+/* ── Home Page ───────────────────────────────────────── */
+
+.home-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.home-page h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.generator-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.generator-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1.5rem;
+  background: white;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.generator-card:hover {
+  border-color: #2563eb;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+
+.generator-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.generator-card p {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+/* ── Generator Page (MRU) ────────────────────────────── */
+
+.generator-page {
   display: grid;
   grid-template-columns: 320px 1fr;
   gap: 1rem;
@@ -42,16 +142,11 @@
   margin: 0 auto;
 }
 
-.diagram-section h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
+/* ── Input Section ───────────────────────────────────── */
 
-.input-description {
-  color: #555;
-  font-size: 0.85rem;
-  margin-bottom: 1.5rem;
+.input-section {
+  display: flex;
+  flex-direction: column;
 }
 
 .mru-form {
@@ -123,19 +218,7 @@
   cursor: default;
 }
 
-.toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
-  color: #555;
-  cursor: pointer;
-  margin-top: 0.15rem;
-}
-
-.toggle-label input[type='checkbox'] {
-  cursor: pointer;
-}
+/* ── Buttons ─────────────────────────────────────────── */
 
 .mru-form button[type='submit'],
 .export-button {
@@ -202,6 +285,8 @@
   cursor: not-allowed;
 }
 
+/* ── Cards ───────────────────────────────────────────── */
+
 .card {
   width: 100%;
   border: 1px solid #ddd;
@@ -219,6 +304,8 @@
   margin-bottom: 0.5rem;
   color: #333;
 }
+
+/* ── Controls Table ──────────────────────────────────── */
 
 .controls-table {
   display: grid;
@@ -258,6 +345,8 @@
   cursor: not-allowed;
   opacity: 0.35;
 }
+
+/* ── Diagram Section ─────────────────────────────────── */
 
 .diagram-section {
   display: flex;
@@ -331,9 +420,15 @@
   color: #991b1b;
 }
 
+/* ── Responsive ──────────────────────────────────────── */
+
 @media (max-width: 768px) {
-  .app-main {
+  .generator-page {
     grid-template-columns: 1fr;
-  padding: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .navbar {
+    flex-wrap: wrap;
   }
 }

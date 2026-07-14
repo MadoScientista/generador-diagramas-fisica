@@ -1,12 +1,14 @@
-import { ExportButton } from './ExportButton.tsx';
+import { useExportSVG } from '../../../hooks/useExportSVG.ts';
 
-interface DiagramViewProps {
+interface DiagramContainerProps {
   svg: string | null;
   error: string | null;
   errorDetail?: string | null;
 }
 
-export function DiagramView({ svg, error, errorDetail }: DiagramViewProps) {
+export function DiagramContainer({ svg, error, errorDetail }: DiagramContainerProps) {
+  const { exportSVG } = useExportSVG(svg);
+
   if (error) {
     return (
       <div className="diagram-error">
@@ -34,7 +36,9 @@ export function DiagramView({ svg, error, errorDetail }: DiagramViewProps) {
     <div className="diagram-container">
       <div className="diagram-header">
         <h3>Vista previa</h3>
-        <ExportButton svg={svg} />
+        <button onClick={exportSVG} disabled={!svg} className="export-button">
+          Exportar
+        </button>
       </div>
       <div dangerouslySetInnerHTML={{ __html: svg }} />
     </div>

@@ -236,6 +236,12 @@ Tolerancia: $|x_f - (x_i + v \cdot t)| \leq 0.001$ (en unidades SI después de c
 
 Si no se cumple, se muestra un error indicando que los valores no son físicamente posibles.
 
+### 7.6 Tiempo negativo
+
+El sistema **no permite tiempos negativos**. La validación rechaza valores de $t < 0$ con el mensaje "El tiempo no puede ser negativo."
+
+Cuando $t$ es la variable calculada (fórmula $t = (x_f - x_i) / v$), si el resultado es negativo el motor lanza error: "El tiempo calculado es negativo. Verifique los valores ingresados."
+
 ---
 
 ## 8. Convenciones físicas y unidades
@@ -275,14 +281,16 @@ Las unidades son **independientes** entre sí. Cada magnitud tiene su propio sel
 
 El flujo de generación de diagramas es:
 
-1. **Resolución de variable faltante** (detectar cuál de los 4 campos debe auto-computarse)
-2. **Conversión de unidades** (entrada → SI → salida)
-3. **Validación** de inputs y consistencia
-4. **Resolución física** (cálculo de $x_f$, $\Delta x$)
-5. **Inferencia** del modelo de diagrama (dirección, orientación, visibilidad)
-6. **Construcción de escena** (SceneGraph con nodos semánticos)
-7. **Layout** (posicionamiento en coordenadas de pantalla)
-8. **Renderizado** (generación de SVG)
+1. **Detección de inputs** (contar campos llenos; si < 3, renderizar diagrama base)
+2. **Validación** de inputs (formato numérico, tiempo no negativo)
+3. **Resolución de variable faltante** (detectar cuál de los 4 campos debe auto-computarse)
+4. **Conversión de unidades** (entrada → SI → salida)
+5. **Resolución física** (cálculo de $x_f$, $v$, $t$ o $x_i$ según corresponda)
+6. **Validación de resultado** (tiempo calculado no puede ser negativo; si 4 campos ingresados, verificar consistencia $x_f \approx x_i + v \cdot t$)
+7. **Inferencia** del modelo de diagrama (dirección, orientación, visibilidad)
+8. **Construcción de escena** (SceneGraph con nodos semánticos)
+9. **Layout** (posicionamiento en coordenadas de pantalla)
+10. **Renderizado** (generación de SVG)
 
 ### 9.2 Diagrama base
 
@@ -290,54 +298,74 @@ Cuando no hay suficientes inputs para resolver (menos de 3 campos numéricos lle
 
 ### 9.3 Generación del diagrama
 
-El formulario se divide en **dos cards** con borde redondeado (`border: 1px solid #ddd; border-radius: 6px; padding: 1.5rem`), separadas por un gap de `1rem`.
+La página del generador MRU (`MRUGeneratorPage`) se divide en dos secciones principales:
 
-**Card 1 - "Datos del diagrama"**: inputs numéricos ($x_i$, $v$, $t$, $x_f$) con sus selectores de unidad. Un botón **"Calcular"** se habilita cuando exactamente 3 campos están llenos; al presionarlo, el motor computa el campo faltante, lo auto-rellena y genera el diagrama.
+**Sección izquierda (formulario):** dos cards con borde redondeado (`border: 1px solid #ddd; border-radius: 6px; padding: 1.5rem`), separadas por un gap de `1rem`.
 
-**Card 2 - "Elementos del diagrama"**: tabla de controles con filas por elemento ($x_i$, $x_f$, $v$, $t$, $\Delta x$) y columnas: *Etiqueta*, *Valor*, *Vector*. Cada checkbox controla la visibilidad del respectivo aspecto en el diagrama. Los checkboxes tienen tamaño `1rem × 1rem`.
+- **Card 1 - "Datos del diagrama"** (`DiagramDataCard`): 4 campos de entrada ($x_i$, $v$, $t$, $x_f$) usando el componente reutilizable `InputWithUnit` (input + selector de unidad). Un botón **"Calcular"** se habilita cuando exactamente 3 campos están llenos; al presionarlo, el motor computa el campo faltante, lo auto-rellena y genera el diagrama.
+
+- **Card 2 - "Elementos del diagrama"** (`DiagramControlsCard`): tabla de controles con filas por elemento ($x_i$, $x_f$, $v$, $t$, $\Delta x$) usando el componente `ControlRow`. Columnas: *Etiqueta*, *Valor*, *Vector*. Los checkboxes tienen tamaño `1rem × 1rem`.
 
 Debajo de ambos cards, un botón **"Generar Diagrama"** genera o regenera el diagrama. También se regenera automáticamente cuando el usuario cambia una unidad de medida o cualquier checkbox de visualización.
 
-Dentro del contenedor del diagrama, un botón **"Exportar"** (alineado a la derecha junto al título "Vista previa") permite descargar el SVG.
-
 Un botón **"Borrar datos"** debajo del formulario resetea todos los inputs, unidades y controles a sus valores por defecto, y limpia el diagrama.
+
+**Sección derecha (diagrama):** componente `DiagramContainer` que muestra header (título "Vista previa" + botón **"Exportar"**) y el SVG generado. Estados vacío/error con `height: 250px`.
 
 ### 9.4 Arquitectura
 
-**Core:**
+**Entry:**
+- `src/main.tsx` → punto de entrada, envuelve la app en `HashRouter` (compatibilidad GitHub Pages)
+- `src/App.tsx` → shell mínimo, renderiza `<AppRoutes />`
+- `src/router.tsx` → configuración de rutas con React Router
+
+**Layout:**
+- `src/ui/components/layout/Header.tsx` → header del sitio (título + subtítulo)
+- `src/ui/components/layout/NavBar.tsx` → barra de navegación con `NavLink` a cada generador
+- `src/ui/components/layout/Footer.tsx` → footer del sitio
+- `src/ui/components/layout/PageLayout.tsx` → layout shell: Header + NavBar + `<Outlet />` + Footer
+
+**Pages:**
+- `src/pages/HomePage.tsx` → catálogo de generadores disponibles (cards con `Link`)
+- `src/pages/MRUGeneratorPage.tsx` → página del generador MRU; orquesta hooks y componentes de UI
+
+**Hooks:**
+- `src/hooks/usePhysicsEngine.ts` → instancia singleton del engine + registry
+- `src/hooks/useExportSVG.ts` → lógica de descarga de SVG
+- `src/hooks/useDiagramControls.ts` → estado de toggles de visibilidad (etiqueta/valor/vector)
+- `src/hooks/useMRUDiagram.ts` → estado completo del generador MRU (inputs, unidades, cálculo, auto-relleno)
+
+**Core (sin cambios):**
 - `src/core/units.ts` → tipos y funciones de conversión de unidades
 - `src/core/format.ts` → formateo de números (3 decimales, sin decimales si es entero)
 - `src/core/layout-engine.ts` → posicionamiento de todos los elementos
 - `src/core/renderer.ts` → conversión de nodos posicionados a SVG
-
-**MRU Module:**
-- `src/modules/mru/scene-builder.ts` → construcción de nodos semánticos; usa `model.controls` para visibilidad de labels y vectores
-- `src/modules/mru/types.ts` → define `DiagramControls` y `ElementControls` para control granular de etiqueta/valor/vector por elemento
-
-**App:**
+- `src/core/module-registry.ts` → registro de módulos de física
 - `src/app/engine.ts` → coordinador del pipeline, recibe `controls: DiagramControls` y lo propaga al modelo
-- `src/App.tsx` → layout principal con grid de 2 columnas (formulario 320px + diagrama 1fr)
-- `src/App.css` → estilos globales incluyendo cards, inputs, controles
+
+**MRU Module (sin cambios):**
+- `src/modules/mru/physics.ts` → resolución de la ecuación MRU; valida que $t \geq 0$
+- `src/modules/mru/validation.ts` → validación de inputs numéricos y restricción $t \geq 0$
+- `src/modules/mru/inference.ts` → inferencia del modelo de diagrama
+- `src/modules/mru/scene-builder.ts` → construcción de nodos semánticos
+- `src/modules/mru/types.ts` → define `DiagramControls`, `ElementControls`, `MRUDiagramModel`
 
 **UI Components:**
-- `src/ui/components/MRUForm.tsx` → formulario con dos cards (datos + elementos), botones Calcular/Generar/Borrar
-- `src/ui/components/DiagramView.tsx` → contenedor del diagrama con header (título + Exportar)
-- `src/ui/components/ExportButton.tsx` → botón de exportación SVG
+- `src/ui/components/form/InputWithUnit.tsx` → componente reutilizable de input + selector de unidad
+- `src/ui/components/form/ControlRow.tsx` → fila individual de la tabla de controles
+- `src/ui/components/form/DiagramDataCard.tsx` → card "Datos del diagrama" (4 inputs + botón Calcular)
+- `src/ui/components/form/DiagramControlsCard.tsx` → card "Elementos del diagrama" (tabla de controles)
+- `src/ui/components/diagram/DiagramContainer.tsx` → contenedor del diagrama (header + SVG + exportar)
 
 **Estilo visual:**
 - Fuente: **Inter** (Roboto como fallback), importada vía Google Fonts
-- Layout principal: CSS Grid `grid-template-columns: 320px 1fr`, gap `1rem`, padding `2rem`
+- Layout de página: flexbox column (`page-layout`), header + navbar + contenido + footer
+- Generador MRU: CSS Grid `grid-template-columns: 320px 1fr`, gap `1rem`, padding `2rem`
 - Cards: `border: 1px solid #ddd; border-radius: 6px; padding: 1.5rem; background: white`, gap interno `0.5rem`
-- Separación entre cards y entre cards y botón: `1rem` (gap de `.mru-form`)
-- Inputs + select: CSS Grid `grid-template-columns: 1fr auto`, select con `appearance: none`, `width: 70px`, flecha SVG personalizada
-- Botón Calcular: `margin-top: 0.5rem` adicional respecto al último input
-- Checkboxes en tabla de controles: `1rem × 1rem`
-- Etiquetas de elementos: centradas con `text-align: center`
-- Contenedor del diagrama: sin altura fija, crece con el contenido SVG (`width: 100%; height: auto`)
-- Header del diagrama: `padding-top: 2rem; margin-bottom: 1.5rem`, título con `padding-left: 2rem`, botón Exportar con `margin-right: 2rem` para alinear bordes con el SVG
-- Estados vacío/error/loading del diagrama: `height: 250px`
+- Navbar: links con `.active` en azul (`#2563eb`)
+- Estados vacío/error del diagrama: `height: 250px`
 
-Los controles de visualización fluyen así: `App.tsx` → `engine.generate({controls})` → `module.infer()` → `MRUDiagramModel.controls` → `scene-builder.ts` que combina condiciones físicas (`showVelocityVector`, `hasDisplacement`) con los toggles del usuario para determinar visibilidad final de cada nodo.
+Los controles de visualización fluyen así: `MRUGeneratorPage` → `useDiagramControls()` → `controls` → `useMRUDiagram(controls)` → `engine.generate({controls})` → `module.infer()` → `MRUDiagramModel.controls` → `scene-builder.ts` que combina condiciones físicas con los toggles del usuario.
 
 ### 9.5 Resolución de variable faltante
 
@@ -352,6 +380,8 @@ El motor detecta qué variable debe calcularse según los campos ingresados al p
 | $x_i$, $v$, $t$, $x_f$ | — | Validar consistencia |
 
 La variable calculada se auto-rellena en el input correspondiente y se marca como **computada**.
+
+Si la variable calculada es $t$ y el resultado es negativo, se muestra un error en vez de auto-rellenar.
 
 Reglas adicionales:
 - Si el usuario edita el campo auto-computado, pasa a ser considerado **ingresado manualmente** y se valida consistencia con los demás

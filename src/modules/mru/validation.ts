@@ -19,5 +19,10 @@ export function validateMRU(input: Record<string, string>): ValidationResult {
     }
   }
 
+  const tVal = input['t']?.trim();
+  if (tVal !== undefined && tVal !== '' && !isNaN(Number(tVal)) && Number(tVal) < 0) {
+    errors.push({ field: 't', message: 'El tiempo no puede ser negativo.' });
+  }
+
   return errors.length > 0 ? { valid: false, errors } : { valid: true };
 }
