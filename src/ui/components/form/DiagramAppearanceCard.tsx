@@ -1,4 +1,6 @@
-export type CharacterType = 'square' | 'person' | 'bike' | 'car';
+import type { CharacterType } from '../../../core/types.ts';
+
+export type { CharacterType };
 export type BackgroundType = 'white' | 'park' | 'city' | 'beach';
 
 interface DiagramAppearanceProps {

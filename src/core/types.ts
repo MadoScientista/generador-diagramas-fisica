@@ -1,4 +1,5 @@
 export type AxisType = 'x' | 'y';
+export type CharacterType = 'square' | 'person' | 'bike' | 'car';
 export type Orientation = 'left' | 'right' | 'none' | 'up' | 'down';
 export type SemanticRole =
   | 'initial'
@@ -52,6 +53,7 @@ export interface PositionNode extends NodeBase {
 export interface CharacterNode extends NodeBase {
   type: 'character';
   orientation: Orientation;
+  characterType?: CharacterType;
 }
 
 export interface VectorNode extends NodeBase {

@@ -64,6 +64,7 @@ export function buildMRUScene(model: MRUDiagramModel): SceneGraph {
         type: 'character',
         visible: true,
         orientation: model.characterOrientation,
+        characterType: model.characterType,
       },
       {
         id: 'velocity-vector',

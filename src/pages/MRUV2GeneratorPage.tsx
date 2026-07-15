@@ -10,6 +10,10 @@ import type { CharacterType, BackgroundType } from '../ui/components/form/Diagra
 
 export function MRUV2GeneratorPage() {
   const { controls, handleControlChange, resetControls } = useDiagramControls();
+
+  const [character, setCharacter] = useState<CharacterType>('square');
+  const [background, setBackground] = useState<BackgroundType>('white');
+
   const {
     values,
     units,
@@ -19,10 +23,7 @@ export function MRUV2GeneratorPage() {
     handleCalculate,
     handleSubmit,
     clearAll,
-  } = useMRUDiagram(controls);
-
-  const [character, setCharacter] = useState<CharacterType>('square');
-  const [background, setBackground] = useState<BackgroundType>('white');
+  } = useMRUDiagram(controls, character);
 
   const handleClear = () => {
     clearAll();
@@ -48,7 +49,7 @@ export function MRUV2GeneratorPage() {
             onVelUnitChange={(unit) => handleUnitChange('velUnit', unit)}
             onCalculate={handleCalculate}
           />
-          <CollapsibleCard title="Elementos del diagrama">
+          <CollapsibleCard title="Elementos del diagrama" defaultOpen={false}>
             <DiagramControlsCard
               controls={controls}
               onControlChange={handleControlChange}

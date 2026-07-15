@@ -1,4 +1,5 @@
-import type { LayoutScene, PositionedNode } from './types.ts';
+import type { LayoutScene, PositionedNode, CharacterType } from './types.ts';
+import { getSpriteConfig } from './sprite-registry.ts';
 
 const TICK_SIZE = 8;
 
@@ -38,10 +39,23 @@ function renderCharacter(node: PositionedNode): string {
   const { position, boundingBox } = node;
   const x = position.x;
   const y = position.y;
-  const size = boundingBox.width;
+  const w = boundingBox.width;
+  const h = boundingBox.height;
+  const charType: CharacterType =
+    node.node.type === 'character' ? (node.node.characterType ?? 'square') : 'square';
+  const orientation = node.node.type === 'character' ? node.node.orientation : 'none';
+  const flipTransform = orientation === 'left'
+    ? ` transform="translate(${2 * x + w}, 0) scale(-1, 1)"`
+    : '';
 
-  return `
-    <rect x="${x}" y="${y}" width="${size}" height="${size}" fill="white" stroke="black" stroke-width="2" />`;
+  const sprite = getSpriteConfig(charType);
+
+  if (charType === 'square' || !sprite.path) {
+    return `
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="white" stroke="black" stroke-width="2" />`;
+  }
+
+  return `<image href="${sprite.path}" x="${x}" y="${y}" width="${w}" height="${h}"${flipTransform} />`;
 }
 
 function renderVector(node: PositionedNode): string {

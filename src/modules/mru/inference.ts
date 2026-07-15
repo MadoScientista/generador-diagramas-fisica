@@ -1,6 +1,7 @@
 import type { MRUResult, MRUDiagramModel, DiagramControls } from './types.ts';
+import type { CharacterType } from '../../core/types.ts';
 
-export function inferMRU(result: MRUResult & { controls?: DiagramControls }): MRUDiagramModel {
+export function inferMRU(result: MRUResult & { controls?: DiagramControls; characterType?: CharacterType }): MRUDiagramModel {
   const controls = result.controls ?? {
     xi: { showLabel: true, showValue: true },
     xf: { showLabel: true, showValue: true },
@@ -47,5 +48,6 @@ export function inferMRU(result: MRUResult & { controls?: DiagramControls }): MR
     timeUnit: result.timeUnit,
     velUnit: result.velUnit,
     controls,
+    characterType: result.characterType ?? 'square',
   };
 }

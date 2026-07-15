@@ -1,4 +1,5 @@
 import type { DistanceUnit, TimeUnit, VelocityUnit } from '../../core/units.ts';
+import type { CharacterType } from '../../core/types.ts';
 
 export type ComputedField = 'x0' | 'xf' | 'v' | 't' | null;
 
@@ -66,5 +67,6 @@ export interface MRUDiagramModel {
   timeUnit: TimeUnit;
   velUnit: VelocityUnit;
   controls: DiagramControls;
+  characterType: CharacterType;
 }
 

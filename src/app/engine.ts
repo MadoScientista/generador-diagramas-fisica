@@ -3,6 +3,7 @@ import type {
   PipelineResult,
   PipelineError,
   SceneGraph,
+  CharacterType,
 } from '../core/types.ts';
 import type { DistanceUnit, TimeUnit, VelocityUnit } from '../core/units.ts';
 import type { ComputedField, DiagramControls } from '../modules/mru/types.ts';
@@ -16,6 +17,7 @@ interface GenerateOptions {
   timeUnit: TimeUnit;
   velUnit: VelocityUnit;
   controls: DiagramControls;
+  characterType?: CharacterType;
 }
 
 interface PipelineResultExtended {
@@ -36,7 +38,7 @@ export class PhysicsDiagramEngine {
   }
 
   generate(opts: GenerateOptions): PipelineResultExtended {
-    const { moduleId, rawInput, x0Unit, xfUnit, timeUnit, velUnit, controls } = opts;
+    const { moduleId, rawInput, x0Unit, xfUnit, timeUnit, velUnit, controls, characterType = 'square' } = opts;
 
     const filledFields = Object.entries(rawInput)
       .filter(([, v]) => v.trim() !== '')
@@ -44,7 +46,7 @@ export class PhysicsDiagramEngine {
     const filledCount = filledFields.length;
 
     if (filledCount < 3) {
-      return this.renderBase();
+      return this.renderBase(characterType);
     }
 
     const module = this.registry.get(moduleId);
@@ -91,6 +93,7 @@ export class PhysicsDiagramEngine {
       velUnit,
       computedField,
       controls,
+      characterType,
     };
 
     let diagramModel;
@@ -136,7 +139,7 @@ export class PhysicsDiagramEngine {
     };
   }
 
-  private renderBase(): PipelineResultExtended & { type: 'success' } {
+  private renderBase(characterType: CharacterType = 'square'): PipelineResultExtended & { type: 'success' } {
     const baseScene: SceneGraph = {
       id: 'scene',
       type: 'scene',
@@ -171,6 +174,7 @@ export class PhysicsDiagramEngine {
           type: 'character',
           visible: true,
           orientation: 'none',
+          characterType,
         },
       ],
     };

@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { usePhysicsEngine } from './usePhysicsEngine.ts';
 import { formatValue } from '../core/format.ts';
-import type { PipelineResult } from '../core/types.ts';
+import type { PipelineResult, CharacterType } from '../core/types.ts';
 import type { DistanceUnit, TimeUnit, VelocityUnit } from '../core/units.ts';
 import type { ComputedField, DiagramControls } from '../modules/mru/types.ts';
 
@@ -9,7 +9,7 @@ function allFilled(x0: string, v: string, t: string, xf: string) {
   return [x0, v, t, xf].every((s) => s.trim() !== '');
 }
 
-export function useMRUDiagram(controls: DiagramControls) {
+export function useMRUDiagram(controls: DiagramControls, characterType: CharacterType = 'square') {
   const { engine } = usePhysicsEngine();
 
   const [x0, setX0] = useState('');
@@ -79,6 +79,7 @@ export function useMRUDiagram(controls: DiagramControls) {
       timeUnit,
       velUnit,
       controls,
+      characterType,
     });
 
     if (res.type === 'success' && res.computedField && res.resolvedValues) {
@@ -104,7 +105,7 @@ export function useMRUDiagram(controls: DiagramControls) {
     }
 
     setResult(res as PipelineResult);
-  }, [buildInput, engine, x0, v, t, xf, x0Unit, xfUnit, timeUnit, velUnit, controls]);
+  }, [buildInput, engine, x0, v, t, xf, x0Unit, xfUnit, timeUnit, velUnit, controls, characterType]);
 
   const handleChange = useCallback((field: 'x0' | 'v' | 't' | 'xf', value: string) => {
     setComputedField((prev) => {
@@ -139,7 +140,7 @@ export function useMRUDiagram(controls: DiagramControls) {
     const id = setTimeout(() => runEngine(), 0);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [x0Unit, xfUnit, timeUnit, velUnit, controls]);
+  }, [x0Unit, xfUnit, timeUnit, velUnit, controls, characterType]);
 
   return {
     values: { x0, v, t, xf },
