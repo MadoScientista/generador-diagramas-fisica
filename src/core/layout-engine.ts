@@ -19,6 +19,7 @@ const VECTOR_LENGTH = 80;
 const POSITION_PADDING = 40;
 const MIN_TICK_GAP = 50;
 const LABEL_OFFSET_Y = 22;
+const LABEL_GAP = 10;
 const DISPLACEMENT_Y_OFFSET = 55;
 
 function getLayer(node: SceneGraphNode): Layer {
@@ -207,7 +208,7 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
           const xiSx = getInitialScreenX(nodes, posMap);
           const screenDist = Math.abs(xiSx - originSx);
           if (screenDist < 50) {
-            labelY = AXIS_Y - charH / 2 - 36;
+            labelY = AXIS_Y - charH - LABEL_GAP;
           } else {
             labelY = AXIS_Y + TICK_SIZE + LABEL_OFFSET_Y;
           }
@@ -220,9 +221,9 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
             const xiSx = getInitialScreenX(nodes, posMap);
             const xiDist = Math.abs(xiSx - originSx);
             if (xiDist < 50) {
-              labelY = AXIS_Y - charH / 2 - 54;
+              labelY = AXIS_Y - charH - LABEL_GAP - 18;
             } else {
-              labelY = AXIS_Y - charH / 2 - 36;
+              labelY = AXIS_Y - charH - LABEL_GAP;
             }
           } else {
             labelY = AXIS_Y + TICK_SIZE + LABEL_OFFSET_Y;
@@ -237,7 +238,7 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
           labelY = AXIS_Y - charH / 2 - 14;
         } else if (node.semanticRole === 'label-t') {
           labelX = (ix + fx) / 2;
-          labelY = AXIS_Y - charH / 2 - 36;
+          labelY = AXIS_Y - charH - LABEL_GAP;
         } else if (node.semanticRole === 'label-dx') {
           labelX = (ix + fx) / 2;
           labelY = AXIS_Y + DISPLACEMENT_Y_OFFSET + LABEL_OFFSET_Y;
