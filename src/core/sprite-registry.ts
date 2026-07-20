@@ -1,9 +1,5 @@
 import type { CharacterType } from './types.ts';
 
-import personaSvg from '../assets/sprites/persona_caminando_1.svg?url';
-import bikeSvg from '../assets/sprites/bicicleta_1.svg?url';
-import carSvg from '../assets/sprites/automovil_1.svg?url';
-
 import personaRaw from '../assets/sprites/persona_caminando_1.svg?raw';
 import bikeRaw from '../assets/sprites/bicicleta_1.svg?raw';
 import carRaw from '../assets/sprites/automovil_1.svg?raw';
@@ -30,15 +26,19 @@ function parseSvgDimensions(raw: string): { width: number; height: number } {
   return { width: 50, height: 50 };
 }
 
+function toDataUri(rawSvg: string): string {
+  return 'data:image/svg+xml;base64,' + btoa(rawSvg);
+}
+
 const personaDims = parseSvgDimensions(personaRaw);
 const bikeDims = parseSvgDimensions(bikeRaw);
 const carDims = parseSvgDimensions(carRaw);
 
 export const SPRITE_REGISTRY: Record<CharacterType, SpriteConfig> = {
   square: { path: '', width: 50, height: 50 },
-  person: { path: personaSvg, width: personaDims.width, height: personaDims.height },
-  bike: { path: bikeSvg, width: bikeDims.width, height: bikeDims.height },
-  car: { path: carSvg, width: carDims.width, height: carDims.height },
+  person: { path: toDataUri(personaRaw), width: personaDims.width, height: personaDims.height },
+  bike: { path: toDataUri(bikeRaw), width: bikeDims.width, height: bikeDims.height },
+  car: { path: toDataUri(carRaw), width: carDims.width, height: carDims.height },
 };
 
 export function getSpriteConfig(type: CharacterType): SpriteConfig {
