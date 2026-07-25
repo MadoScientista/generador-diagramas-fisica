@@ -170,7 +170,10 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
       }
 
       case 'character': {
-        const cx = getInitialScreenX(nodes, posMap);
+        const charPosition = (node as { position?: string }).position;
+        const cx = charPosition === 'final'
+          ? getFinalScreenX(nodes, posMap)
+          : getInitialScreenX(nodes, posMap);
         pos = { x: cx - charW / 2, y: AXIS_Y - charH };
         w = charW;
         h = charH;
@@ -182,16 +185,25 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
         let refX: number;
         if (vectorPosition === 'final') {
           refX = getFinalScreenX(nodes, posMap);
+        } else if (vectorPosition === 'center') {
+          refX = (getInitialScreenX(nodes, posMap) + getFinalScreenX(nodes, posMap)) / 2;
         } else {
           refX = getInitialScreenX(nodes, posMap);
         }
         const arrowLen = node.orientation === 'left' ? -VECTOR_LENGTH : VECTOR_LENGTH;
-        const startX = node.orientation === 'right'
-          ? refX + charW / 2
-          : refX - charW / 2;
+        let startX: number;
+        if (vectorPosition === 'center' || (vectorPosition === 'final' && node.vectorType === 'velocity')) {
+          startX = refX - arrowLen / 2;
+        } else {
+          startX = node.orientation === 'right'
+            ? refX + charW / 2
+            : refX - charW / 2;
+        }
         const vy = node.vectorType === 'acceleration'
-          ? AXIS_Y - charH - 10
-          : AXIS_Y - charH / 2;
+          ? AXIS_Y - charH - 18
+          : vectorPosition === 'final'
+            ? AXIS_Y - charH - 14
+            : AXIS_Y - charH / 2;
         pos = { x: startX, y: vy };
         w = arrowLen;
         break;
@@ -254,19 +266,14 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
           labelX = ix + dir * offset;
           labelY = AXIS_Y - charH / 2 - 14;
         } else if (node.semanticRole === 'label-vf') {
-          const dir = ix <= fx ? 1 : -1;
-          const baseOffset = charW / 2 + VECTOR_LENGTH / 2;
-          const estHalfWidth = node.text.length * 4;
-          const minOffset = charW / 2 + 10 + estHalfWidth;
-          const offset = Math.max(baseOffset, minOffset);
-          labelX = fx + dir * offset;
-          labelY = AXIS_Y - charH / 2 - 14;
+          labelX = fx;
+          labelY = AXIS_Y - charH - 30;
         } else if (node.semanticRole === 'label-a') {
           labelX = (ix + fx) / 2;
-          labelY = AXIS_Y - charH - LABEL_GAP - 18;
+          labelY = AXIS_Y - charH - LABEL_GAP - 25;
         } else if (node.semanticRole === 'label-t') {
           labelX = (ix + fx) / 2;
-          labelY = AXIS_Y - charH - LABEL_GAP;
+          labelY = AXIS_Y - charH - LABEL_GAP - 55;
         } else if (node.semanticRole === 'label-dx') {
           labelX = (ix + fx) / 2;
           labelY = AXIS_Y + DISPLACEMENT_Y_OFFSET + LABEL_OFFSET_Y;

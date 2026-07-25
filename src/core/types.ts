@@ -56,6 +56,7 @@ export interface CharacterNode extends NodeBase {
   type: 'character';
   orientation: Orientation;
   characterType?: CharacterType;
+  position?: 'initial' | 'final';
 }
 
 export interface VectorNode extends NodeBase {
