@@ -47,6 +47,7 @@ export function MRUGeneratorPage() {
             onTimeUnitChange={(unit) => handleUnitChange('timeUnit', unit)}
             onVelUnitChange={(unit) => handleUnitChange('velUnit', unit)}
             onCalculate={handleCalculate}
+            onClear={handleClear}
           />
           <DiagramControlsCard
             controls={controls}
@@ -56,9 +57,6 @@ export function MRUGeneratorPage() {
             Generar Diagrama
           </button>
         </form>
-        <button className="clear-button" onClick={handleClear}>
-          Borrar datos
-        </button>
       </section>
 
       <section className="diagram-section">

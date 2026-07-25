@@ -10,8 +10,8 @@ import type { CharacterType, BackgroundType } from '../ui/components/form/Diagra
 import type { DiagramControls } from '../modules/mruv/types.ts';
 
 const MRUV_DEFAULTS: DiagramControls = {
-  xi: { showLabel: true, showValue: true },
-  xf: { showLabel: true, showValue: true },
+  xi: { showLabel: true, showValue: true, showCharacter: true },
+  xf: { showLabel: true, showValue: true, showCharacter: false },
   vi: { showLabel: true, showValue: true, showVector: true },
   vf: { showLabel: true, showValue: true, showVector: true },
   a: { showLabel: true, showValue: true, showVector: true },
@@ -61,6 +61,7 @@ export function MRUVGeneratorPage() {
           onVfUnitChange={(unit) => handleUnitChange('vfUnit', unit)}
           onAUnitChange={(unit) => handleUnitChange('aUnit', unit)}
           onTimeUnitChange={(unit) => handleUnitChange('timeUnit', unit)}
+          onClear={handleClear}
         />
         <CollapsibleCard title="Elementos del diagrama" defaultOpen={false}>
           <DiagramControlsCardMRUV
@@ -77,9 +78,6 @@ export function MRUVGeneratorPage() {
             onBackgroundChange={setBackground}
           />
         </CollapsibleCard>
-        <button className="clear-button" onClick={handleClear}>
-          Borrar datos
-        </button>
       </section>
 
       <section className="diagram-section">

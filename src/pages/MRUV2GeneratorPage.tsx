@@ -57,6 +57,7 @@ export function MRUV2GeneratorPage() {
             onTimeUnitChange={(unit) => handleUnitChange('timeUnit', unit)}
             onVelUnitChange={(unit) => handleUnitChange('velUnit', unit)}
             onCalculate={handleCalculate}
+            onClear={handleClear}
           />
           <CollapsibleCard title="Elementos del diagrama" defaultOpen={false}>
             <DiagramControlsCard
@@ -77,9 +78,6 @@ export function MRUV2GeneratorPage() {
             Generar Diagrama
           </button>
         </form>
-        <button className="clear-button" onClick={handleClear}>
-          Borrar datos
-        </button>
       </section>
 
       <section className="diagram-section">
