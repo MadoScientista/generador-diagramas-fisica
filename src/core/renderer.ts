@@ -26,6 +26,8 @@ function renderOrigin(node: PositionedNode): string {
 }
 
 function renderPosition(node: PositionedNode): string {
+  if (node.node.type === 'position' && !node.node.showMarker) return '';
+
   const { position, boundingBox } = node;
   const x = position.x;
   const y = position.y;

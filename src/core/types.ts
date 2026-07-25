@@ -12,6 +12,8 @@ export type SemanticRole =
   | 'label-xi'
   | 'label-xf'
   | 'label-v'
+  | 'label-vi'
+  | 'label-vf'
   | 'label-a'
   | 'label-dx'
   | 'label-t'
@@ -61,6 +63,7 @@ export interface VectorNode extends NodeBase {
   vectorType: VectorType;
   orientation: Orientation;
   magnitude: number;
+  position?: 'initial' | 'final';
 }
 
 export interface LabelNode extends NodeBase {

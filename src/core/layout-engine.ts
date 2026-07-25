@@ -178,12 +178,21 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
       }
 
       case 'vector': {
-        const ix = getInitialScreenX(nodes, posMap);
+        const vectorPosition = node.position;
+        let refX: number;
+        if (vectorPosition === 'final') {
+          refX = getFinalScreenX(nodes, posMap);
+        } else {
+          refX = getInitialScreenX(nodes, posMap);
+        }
         const arrowLen = node.orientation === 'left' ? -VECTOR_LENGTH : VECTOR_LENGTH;
         const startX = node.orientation === 'right'
-          ? ix + charW / 2
-          : ix - charW / 2;
-        pos = { x: startX, y: AXIS_Y - charH / 2 };
+          ? refX + charW / 2
+          : refX - charW / 2;
+        const vy = node.vectorType === 'acceleration'
+          ? AXIS_Y - charH - 10
+          : AXIS_Y - charH / 2;
+        pos = { x: startX, y: vy };
         w = arrowLen;
         break;
       }
@@ -236,6 +245,25 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
           const offset = Math.max(baseOffset, minOffset);
           labelX = ix + dir * offset;
           labelY = AXIS_Y - charH / 2 - 14;
+        } else if (node.semanticRole === 'label-vi') {
+          const dir = ix <= fx ? 1 : -1;
+          const baseOffset = charW / 2 + VECTOR_LENGTH / 2;
+          const estHalfWidth = node.text.length * 4;
+          const minOffset = charW / 2 + 10 + estHalfWidth;
+          const offset = Math.max(baseOffset, minOffset);
+          labelX = ix + dir * offset;
+          labelY = AXIS_Y - charH / 2 - 14;
+        } else if (node.semanticRole === 'label-vf') {
+          const dir = ix <= fx ? 1 : -1;
+          const baseOffset = charW / 2 + VECTOR_LENGTH / 2;
+          const estHalfWidth = node.text.length * 4;
+          const minOffset = charW / 2 + 10 + estHalfWidth;
+          const offset = Math.max(baseOffset, minOffset);
+          labelX = fx + dir * offset;
+          labelY = AXIS_Y - charH / 2 - 14;
+        } else if (node.semanticRole === 'label-a') {
+          labelX = (ix + fx) / 2;
+          labelY = AXIS_Y - charH - LABEL_GAP - 18;
         } else if (node.semanticRole === 'label-t') {
           labelX = (ix + fx) / 2;
           labelY = AXIS_Y - charH - LABEL_GAP;
