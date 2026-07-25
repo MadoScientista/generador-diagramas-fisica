@@ -10,7 +10,7 @@ Ruta: `/generador/mru-v2`
 
 | Aspecto | MRU v1 | MRU v2 |
 |---------|--------|--------|
-| Tarjeta "Elementos del diagrama" | Card estatica siempre visible | **CollapsibleCard** (desplegable, abierto por defecto) |
+| Tarjeta "Elementos del diagrama" | Card estatica siempre visible | **CollapsibleCard** (desplegable, cerrado por defecto) |
 | Tarjeta "Apariencia diagrama" | No existe | **CollapsibleCard** (desplegable, cerrado por defecto) |
 | Selector de movil | No existe | Selector con opciones: Cuadrado, Persona, Bicicleta, Automovil |
 | Selector de fondo | No existe | Selector con opciones: Blanco, Parque, Ciudad, Playa |
@@ -42,7 +42,7 @@ Componente reutilizable (`src/ui/components/shared/CollapsibleCard.tsx`).
 
 | Tarjeta | `defaultOpen` | Contenido |
 |---------|---------------|-----------|
-| "Elementos del diagrama" | `true` (abierto) | `DiagramControlsCard` con `showTitle={false}` |
+| "Elementos del diagrama" | `false` (cerrado) | `DiagramControlsCard` con `showTitle={false}` |
 | "Apariencia diagrama" | `false` (cerrado) | `DiagramAppearanceCard` |
 
 ---
@@ -71,7 +71,9 @@ Los valores de movil y fondo se manejan con `useState` local en `MRUV2GeneratorP
 
 ### 3.4 Funcionalidad
 
-**Por ahora es solo estructura visual.** Los selectores no afectan el diagrama generado. La implementacion de la funcionalidad (cambiar el aspecto del movil y del fondo en el SVG) se hara en una futura iteracion.
+El selector de **movil** es funcional: el valor se pasa a `useMRUDiagram(controls, character)` y se propaga al motor, cambiando el tipo de personaje en el SVG generado (cuadrado, persona, bicicleta o automovil).
+
+El selector de **fondo** es solo estructura visual por ahora. El valor se almacena en estado local pero no se pasa al motor ni al renderer. La implementacion de fondos se hara en una futura iteracion.
 
 ---
 

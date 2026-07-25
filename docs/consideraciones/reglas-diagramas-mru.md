@@ -340,12 +340,16 @@ Un botón **"Borrar datos"** debajo del formulario resetea todos los inputs, uni
 - `src/hooks/useMRUDiagram.ts` → estado completo del generador MRU (inputs, unidades, cálculo, auto-relleno)
 
 **Core (sin cambios):**
+- `src/core/types.ts` → definiciones de tipos compartidos (`SceneGraphNode`, `CharacterType`, `Orientation`, `SemanticRole`, `PipelineResult`, etc.)
 - `src/core/units.ts` → tipos y funciones de conversión de unidades
 - `src/core/format.ts` → formateo de números (3 decimales, sin decimales si es entero)
 - `src/core/layout-engine.ts` → posicionamiento de todos los elementos
 - `src/core/renderer.ts` → conversión de nodos posicionados a SVG
 - `src/core/module-registry.ts` → registro de módulos de física
+- `src/core/sprite-registry.ts` → carga y configuración de sprites SVG (persona, bicicleta, automóvil)
+- `src/core/index.ts` → re-exportaciones barrel de todo core
 - `src/app/engine.ts` → coordinador del pipeline, recibe `controls: DiagramControls` y lo propaga al modelo
+- `src/app/index.ts` → re-exportación barrel de `PhysicsDiagramEngine`
 
 **MRU Module (sin cambios):**
 - `src/modules/mru/physics.ts` → resolución de la ecuación MRU; valida que $t \geq 0$
@@ -364,9 +368,10 @@ Un botón **"Borrar datos"** debajo del formulario resetea todos los inputs, uni
 **Estilo visual:**
 - Fuente: **Inter** (Roboto como fallback), importada vía Google Fonts
 - Layout de página: flexbox column (`page-layout`), header + navbar + contenido + footer
+- Header: alineado a la izquierda, texto contenido con `max-width: 1200px; margin: 0 auto; padding-left: 2rem` en `h1` y `.subtitle` para alinearse con las tarjetas del generador
+- Navbar: `border-top: 1px solid #ddd; border-bottom: 1px solid #ddd`, links con `.active` en azul (`#2563eb`)
 - Generador MRU: CSS Grid `grid-template-columns: 320px 1fr`, gap `1rem`, padding `2rem`
 - Cards: `border: 1px solid #ddd; border-radius: 6px; padding: 1.5rem; background: white`, gap interno `0.5rem`
-- Navbar: links con `.active` en azul (`#2563eb`)
 - Estados vacío/error del diagrama: `height: 250px`
 
 Los controles de visualización fluyen así: `MRUGeneratorPage` → `useDiagramControls()` → `controls` → `useMRUDiagram(controls)` → `engine.generate({controls})` → `module.infer()` → `MRUDiagramModel.controls` → `scene-builder.ts` que combina condiciones físicas con los toggles del usuario.
