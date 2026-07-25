@@ -3,9 +3,9 @@ import type { DistanceUnit, TimeUnit, VelocityUnit, AccelerationUnit } from '../
 import { InputWithUnit } from '../form/InputWithUnit.tsx';
 
 interface DiagramDataCardMRUVProps {
-  values: { xi: string; vi: string; a: string; t: string };
-  computedValues: { xf: string; vf: string } | null;
-  onChange: (field: 'xi' | 'vi' | 'a' | 't', value: string) => void;
+  values: { xi: string; xf: string; vi: string; vf: string; a: string; t: string };
+  computedValues: Record<string, string> | null;
+  onChange: (field: 'xi' | 'xf' | 'vi' | 'vf' | 'a' | 't', value: string) => void;
   xiUnit: DistanceUnit;
   xfUnit: DistanceUnit;
   viUnit: VelocityUnit;
@@ -18,6 +18,7 @@ interface DiagramDataCardMRUVProps {
   onVfUnitChange: (unit: VelocityUnit) => void;
   onAUnitChange: (unit: AccelerationUnit) => void;
   onTimeUnitChange: (unit: TimeUnit) => void;
+  onClear: () => void;
 }
 
 export function DiagramDataCardMRUV({
@@ -36,6 +37,7 @@ export function DiagramDataCardMRUV({
   onVfUnitChange,
   onAUnitChange,
   onTimeUnitChange,
+  onClear,
 }: DiagramDataCardMRUVProps) {
   return (
     <div className="card">
@@ -43,27 +45,51 @@ export function DiagramDataCardMRUV({
       <InputWithUnit
         id="xi"
         label="Posicion inicial"
-        value={values.xi}
+        value={computedValues?.xi ?? values.xi}
         placeholder="xi"
         unit={xiUnit}
         units={DISTANCE_UNITS}
         onChange={(val) => onChange('xi', val)}
         onUnitChange={(unit) => onXiUnitChange(unit as DistanceUnit)}
       />
+      {/* TODO: re-habilitar cuando se vuelvan a mostrar xf
+      <InputWithUnit
+        id="xf"
+        label="Posicion final"
+        value={computedValues?.xf ?? values.xf}
+        placeholder="xf"
+        unit={xfUnit}
+        units={DISTANCE_UNITS}
+        onChange={(val) => onChange('xf', val)}
+        onUnitChange={(unit) => onXfUnitChange(unit as DistanceUnit)}
+      />
+      */}
       <InputWithUnit
         id="vi"
         label="Velocidad inicial"
-        value={values.vi}
+        value={computedValues?.vi ?? values.vi}
         placeholder="vi"
         unit={viUnit}
         units={VELOCITY_UNITS}
         onChange={(val) => onChange('vi', val)}
         onUnitChange={(unit) => onViUnitChange(unit as VelocityUnit)}
       />
+      {/* TODO: re-habilitar cuando se vuelvan a mostrar vf
+      <InputWithUnit
+        id="vf"
+        label="Velocidad final"
+        value={computedValues?.vf ?? values.vf}
+        placeholder="vf"
+        unit={vfUnit}
+        units={VELOCITY_UNITS}
+        onChange={(val) => onChange('vf', val)}
+        onUnitChange={(unit) => onVfUnitChange(unit as VelocityUnit)}
+      />
+      */}
       <InputWithUnit
         id="a"
         label="Aceleracion"
-        value={values.a}
+        value={computedValues?.a ?? values.a}
         placeholder="a"
         unit={aUnit}
         units={ACCELERATION_UNITS}
@@ -73,35 +99,16 @@ export function DiagramDataCardMRUV({
       <InputWithUnit
         id="t"
         label="Tiempo"
-        value={values.t}
+        value={computedValues?.t ?? values.t}
         placeholder="t"
         unit={timeUnit}
         units={TIME_UNITS}
         onChange={(val) => onChange('t', val)}
         onUnitChange={(unit) => onTimeUnitChange(unit as TimeUnit)}
       />
-      <InputWithUnit
-        id="vf"
-        label="Velocidad final"
-        value={computedValues?.vf ?? ''}
-        placeholder="--"
-        unit={vfUnit}
-        units={VELOCITY_UNITS}
-        disabled
-        onChange={() => {}}
-        onUnitChange={(unit) => onVfUnitChange(unit as VelocityUnit)}
-      />
-      <InputWithUnit
-        id="xf"
-        label="Posicion final"
-        value={computedValues?.xf ?? ''}
-        placeholder="--"
-        unit={xfUnit}
-        units={DISTANCE_UNITS}
-        disabled
-        onChange={() => {}}
-        onUnitChange={(unit) => onXfUnitChange(unit as DistanceUnit)}
-      />
+      <button type="button" className="clear-button" onClick={onClear}>
+        Borrar datos
+      </button>
     </div>
   );
 }

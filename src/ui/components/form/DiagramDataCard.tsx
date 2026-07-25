@@ -14,6 +14,7 @@ interface DiagramDataCardProps {
   onTimeUnitChange: (unit: TimeUnit) => void;
   onVelUnitChange: (unit: VelocityUnit) => void;
   onCalculate: () => void;
+  onClear: () => void;
 }
 
 export function DiagramDataCard({
@@ -28,6 +29,7 @@ export function DiagramDataCard({
   onTimeUnitChange,
   onVelUnitChange,
   onCalculate,
+  onClear,
 }: DiagramDataCardProps) {
   const filledCount = [values.x0, values.v, values.t, values.xf].filter((s) => s.trim() !== '').length;
 
@@ -76,6 +78,9 @@ export function DiagramDataCard({
       />
       <button type="button" className="calculate-button" onClick={onCalculate} disabled={filledCount !== 3}>
         Calcular
+      </button>
+      <button type="button" className="clear-button" onClick={onClear}>
+        Borrar datos
       </button>
     </div>
   );

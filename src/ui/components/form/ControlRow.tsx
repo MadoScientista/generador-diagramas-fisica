@@ -36,7 +36,7 @@ export function ControlRow({ id, label, hasVector, control, onControlChange }: C
             checked={'showVector' in control ? (control as ElementControls & { showVector: boolean }).showVector : false}
             onChange={() => onControlChange(id, 'showVector', !('showVector' in control ? (control as ElementControls & { showVector: boolean }).showVector : false))}
           />
-        ) : null}
+        ) : <input type="checkbox" disabled />}
       </span>
     </div>
   );
