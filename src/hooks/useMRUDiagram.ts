@@ -5,25 +5,31 @@ import type { PipelineResult, CharacterType } from '../core/types.ts';
 import type { DistanceUnit, TimeUnit, VelocityUnit } from '../core/units.ts';
 import type { ComputedField, DiagramControls } from '../modules/mru/types.ts';
 
-function allFilled(x0: string, v: string, t: string, xf: string) {
-  return [x0, v, t, xf].every((s) => s.trim() !== '');
+interface MRUState {
+  values: { x0: string; v: string; t: string; xf: string };
+  units: { x0Unit: DistanceUnit; xfUnit: DistanceUnit; timeUnit: TimeUnit; velUnit: VelocityUnit };
+  result: PipelineResult | null;
+  computedField: { field: ComputedField; value: string } | null;
+}
+
+const INITIAL_STATE: MRUState = {
+  values: { x0: '', v: '', t: '', xf: '' },
+  units: { x0Unit: 'm', xfUnit: 'm', timeUnit: 's', velUnit: 'm/s' },
+  result: null,
+  computedField: null,
+};
+
+function allFilled(values: MRUState['values']) {
+  return Object.values(values).every((s) => s.trim() !== '');
 }
 
 export function useMRUDiagram(controls: DiagramControls, characterType: CharacterType = 'square') {
   const { engine } = usePhysicsEngine();
 
-  const [x0, setX0] = useState('');
-  const [v, setV] = useState('');
-  const [t, setT] = useState('');
-  const [xf, setXf] = useState('');
-  const [x0Unit, setX0Unit] = useState<DistanceUnit>('m');
-  const [xfUnit, setXfUnit] = useState<DistanceUnit>('m');
-  const [timeUnit, setTimeUnit] = useState<TimeUnit>('s');
-  const [velUnit, setVelUnit] = useState<VelocityUnit>('m/s');
-  const [result, setResult] = useState<PipelineResult | null>(null);
-  const [computedField, setComputedField] = useState<{ field: ComputedField; value: string } | null>(null);
+  const [state, setState] = useState<MRUState>(INITIAL_STATE);
+  const { values, units, result, computedField } = state;
 
-  const prevUnitsRef = useRef({ x0Unit, xfUnit, timeUnit, velUnit });
+  const prevUnitsRef = useRef(units);
 
   const svg = result && result.type === 'success' ? result.svg : null;
   const error = result && result.type !== 'success' ? result.message : null;
@@ -33,29 +39,20 @@ export function useMRUDiagram(controls: DiagramControls, characterType: Characte
       : null;
 
   const clearAll = useCallback(() => {
-    setX0('');
-    setV('');
-    setT('');
-    setXf('');
-    setX0Unit('m');
-    setXfUnit('m');
-    setTimeUnit('s');
-    setVelUnit('m/s');
-    setResult(null);
-    setComputedField(null);
-    prevUnitsRef.current = { x0Unit: 'm', xfUnit: 'm', timeUnit: 's', velUnit: 'm/s' };
+    setState(INITIAL_STATE);
+    prevUnitsRef.current = INITIAL_STATE.units;
   }, []);
 
   const buildInput = useCallback(() => {
-    const rawInput: Record<string, string> = { x0, v, t, xf };
+    const rawInput: Record<string, string> = { x0: values.x0, v: values.v, t: values.t, xf: values.xf };
 
-    if (allFilled(x0, v, t, xf)) {
+    if (allFilled(values)) {
       const prev = prevUnitsRef.current;
       let didClear = false;
-      if (x0Unit !== prev.x0Unit) { rawInput.x0 = ''; didClear = true; }
-      if (xfUnit !== prev.xfUnit) { rawInput.xf = ''; didClear = true; }
-      if (timeUnit !== prev.timeUnit) { rawInput.t = ''; didClear = true; }
-      if (velUnit !== prev.velUnit) { rawInput.v = ''; didClear = true; }
+      if (units.x0Unit !== prev.x0Unit) { rawInput.x0 = ''; didClear = true; }
+      if (units.xfUnit !== prev.xfUnit) { rawInput.xf = ''; didClear = true; }
+      if (units.timeUnit !== prev.timeUnit) { rawInput.t = ''; didClear = true; }
+      if (units.velUnit !== prev.velUnit) { rawInput.v = ''; didClear = true; }
 
       if (!didClear && computedField) {
         if (rawInput[computedField.field!] === computedField.value) {
@@ -64,9 +61,9 @@ export function useMRUDiagram(controls: DiagramControls, characterType: Characte
       }
     }
 
-    prevUnitsRef.current = { x0Unit, xfUnit, timeUnit, velUnit };
+    prevUnitsRef.current = units;
     return rawInput;
-  }, [x0, v, t, xf, x0Unit, xfUnit, timeUnit, velUnit, computedField]);
+  }, [values, units, computedField]);
 
   const runEngine = useCallback(() => {
     const rawInput = buildInput();
@@ -74,10 +71,10 @@ export function useMRUDiagram(controls: DiagramControls, characterType: Characte
     const res = engine.generate({
       moduleId: 'mru',
       rawInput,
-      x0Unit,
-      xfUnit,
-      timeUnit,
-      velUnit,
+      x0Unit: units.x0Unit,
+      xfUnit: units.xfUnit,
+      timeUnit: units.timeUnit,
+      velUnit: units.velUnit,
       controls,
       characterType,
     });
@@ -87,43 +84,35 @@ export function useMRUDiagram(controls: DiagramControls, characterType: Characte
       const computedValue = res.resolvedValues[cf];
       const computedStr = formatValue(computedValue);
 
-      if (cf === 'x0' && x0 !== computedStr) {
-        setX0(computedStr);
-        setComputedField({ field: 'x0', value: computedStr });
-      } else if (cf === 'xf' && xf !== computedStr) {
-        setXf(computedStr);
-        setComputedField({ field: 'xf', value: computedStr });
-      } else if (cf === 'v' && v !== computedStr) {
-        setV(computedStr);
-        setComputedField({ field: 'v', value: computedStr });
-      } else if (cf === 't' && t !== computedStr) {
-        setT(computedStr);
-        setComputedField({ field: 't', value: computedStr });
-      }
+      setState((prev) => {
+        if (prev.values[cf] === computedStr) return prev;
+        return {
+          ...prev,
+          values: { ...prev.values, [cf]: computedStr },
+          computedField: { field: cf, value: computedStr },
+        };
+      });
     } else if (res.type === 'success') {
-      setComputedField(null);
+      setState((prev) => ({ ...prev, computedField: null }));
     }
 
-    setResult(res as PipelineResult);
-  }, [buildInput, engine, x0, v, t, xf, x0Unit, xfUnit, timeUnit, velUnit, controls, characterType]);
+    setState((prev) => ({ ...prev, result: res as PipelineResult }));
+  }, [buildInput, engine, units, controls, characterType]);
 
   const handleChange = useCallback((field: 'x0' | 'v' | 't' | 'xf', value: string) => {
-    setComputedField((prev) => {
-      if (prev?.field === field) return null;
-      return prev;
-    });
-    if (field === 'x0') setX0(value);
-    else if (field === 'v') setV(value);
-    else if (field === 't') setT(value);
-    else setXf(value);
+    setState((prev) => ({
+      ...prev,
+      values: { ...prev.values, [field]: value },
+      computedField: prev.computedField?.field === field ? null : prev.computedField,
+    }));
   }, []);
 
   const handleUnitChange = useCallback(
     (unitKind: 'x0Unit' | 'xfUnit' | 'timeUnit' | 'velUnit', value: string) => {
-      if (unitKind === 'x0Unit') setX0Unit(value as DistanceUnit);
-      else if (unitKind === 'xfUnit') setXfUnit(value as DistanceUnit);
-      else if (unitKind === 'timeUnit') setTimeUnit(value as TimeUnit);
-      else setVelUnit(value as VelocityUnit);
+      setState((prev) => ({
+        ...prev,
+        units: { ...prev.units, [unitKind]: value },
+      }));
     },
     []
   );
@@ -140,11 +129,11 @@ export function useMRUDiagram(controls: DiagramControls, characterType: Characte
     const id = setTimeout(() => runEngine(), 0);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [x0Unit, xfUnit, timeUnit, velUnit, controls, characterType]);
+  }, [units.x0Unit, units.xfUnit, units.timeUnit, units.velUnit, controls, characterType]);
 
   return {
-    values: { x0, v, t, xf },
-    units: { x0Unit, xfUnit, timeUnit, velUnit },
+    values,
+    units,
     result: { svg, error, errorDetail },
     computedField,
     handleChange,

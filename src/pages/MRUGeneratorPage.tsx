@@ -3,9 +3,18 @@ import { useMRUDiagram } from '../hooks/useMRUDiagram.ts';
 import { DiagramDataCard } from '../ui/components/form/DiagramDataCard.tsx';
 import { DiagramControlsCard } from '../ui/components/form/DiagramControlsCard.tsx';
 import { DiagramContainer } from '../ui/components/diagram/DiagramContainer.tsx';
+import type { DiagramControls } from '../modules/mru/types.ts';
+
+const MRU_DEFAULTS: DiagramControls = {
+  xi: { showLabel: true, showValue: true },
+  xf: { showLabel: true, showValue: true },
+  v: { showLabel: true, showValue: true, showVector: true },
+  t: { showLabel: true, showValue: true },
+  dx: { showLabel: true, showValue: true, showVector: true },
+};
 
 export function MRUGeneratorPage() {
-  const { controls, handleControlChange, resetControls } = useDiagramControls();
+  const { controls, handleControlChange, resetControls } = useDiagramControls(MRU_DEFAULTS);
   const {
     values,
     units,

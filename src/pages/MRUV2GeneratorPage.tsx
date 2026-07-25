@@ -7,9 +7,18 @@ import { DiagramContainer } from '../ui/components/diagram/DiagramContainer.tsx'
 import { CollapsibleCard } from '../ui/components/shared/CollapsibleCard.tsx';
 import { DiagramAppearanceCard } from '../ui/components/form/DiagramAppearanceCard.tsx';
 import type { CharacterType, BackgroundType } from '../ui/components/form/DiagramAppearanceCard.tsx';
+import type { DiagramControls } from '../modules/mru/types.ts';
+
+const MRU_DEFAULTS: DiagramControls = {
+  xi: { showLabel: true, showValue: true },
+  xf: { showLabel: true, showValue: true },
+  v: { showLabel: true, showValue: true, showVector: true },
+  t: { showLabel: true, showValue: true },
+  dx: { showLabel: true, showValue: true, showVector: true },
+};
 
 export function MRUV2GeneratorPage() {
-  const { controls, handleControlChange, resetControls } = useDiagramControls();
+  const { controls, handleControlChange, resetControls } = useDiagramControls(MRU_DEFAULTS);
 
   const [character, setCharacter] = useState<CharacterType>('square');
   const [background, setBackground] = useState<BackgroundType>('white');

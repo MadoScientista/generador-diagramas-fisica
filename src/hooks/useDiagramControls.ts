@@ -1,19 +1,13 @@
 import { useState, useCallback } from 'react';
-import type { DiagramControls, ElementControls } from '../modules/mru/types.ts';
+import type { ElementControls } from '../modules/mru/types.ts';
 
-const DEFAULT_CONTROLS: DiagramControls = {
-  xi: { showLabel: true, showValue: true },
-  xf: { showLabel: true, showValue: true },
-  v: { showLabel: true, showValue: true, showVector: true },
-  t: { showLabel: true, showValue: true },
-  dx: { showLabel: true, showValue: true, showVector: true },
-};
+export type { ElementControls };
 
-export function useDiagramControls() {
-  const [controls, setControls] = useState<DiagramControls>(DEFAULT_CONTROLS);
+export function useDiagramControls<T extends Record<string, ElementControls>>(defaultControls: T) {
+  const [controls, setControls] = useState<T>(defaultControls);
 
   const handleControlChange = useCallback(
-    (element: keyof DiagramControls, field: keyof ElementControls, value: boolean) => {
+    (element: keyof T, field: keyof ElementControls, value: boolean) => {
       setControls((prev) => ({
         ...prev,
         [element]: { ...prev[element], [field]: value },
@@ -23,8 +17,8 @@ export function useDiagramControls() {
   );
 
   const resetControls = useCallback(() => {
-    setControls(DEFAULT_CONTROLS);
-  }, []);
+    setControls(defaultControls);
+  }, [defaultControls]);
 
   return { controls, handleControlChange, resetControls };
 }
