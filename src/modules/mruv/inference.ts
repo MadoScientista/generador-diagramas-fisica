@@ -36,6 +36,9 @@ export function inferMRUV(result: MRUVResult & { controls?: DiagramControls; cha
   const showVfVector = result.vf !== 0;
   const showAccelerationVector = result.a !== 0;
 
+  const showCharacterXi = controls.xi.showCharacter ?? true;
+  const showCharacterXf = controls.xf.showCharacter ?? false;
+
   const crossesOrigin =
     (result.xi < 0 && result.xf > 0) || (result.xi > 0 && result.xf < 0);
 
@@ -48,6 +51,8 @@ export function inferMRUV(result: MRUVResult & { controls?: DiagramControls; cha
     showViVector,
     showVfVector,
     showAccelerationVector,
+    showCharacterXi,
+    showCharacterXf,
     characterOrientation,
     xi: result.xi,
     xf: result.xf,

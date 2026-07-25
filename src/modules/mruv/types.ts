@@ -8,14 +8,16 @@ export interface ElementControls {
 }
 
 export type DiagramControls = {
-  xi: ElementControls;
-  xf: ElementControls;
+  xi: ElementControls & { showCharacter?: boolean };
+  xf: ElementControls & { showCharacter?: boolean };
   vi: ElementControls & { showVector: boolean };
   vf: ElementControls & { showVector: boolean };
   a: ElementControls & { showVector: boolean };
   t: ElementControls;
   dx: ElementControls & { showVector: boolean };
 };
+
+export type ComputedField = 'xi' | 'xf' | 'vi' | 'vf' | 'a' | 't' | null;
 
 export interface MRUVSolveInput {
   xi?: number;
@@ -40,7 +42,8 @@ export interface MRUVResolvedVars {
   a: number;
   t: number;
   dx: number;
-  computedField: null;
+  computedField: ComputedField;
+  computedFields: ComputedField[];
 }
 
 export interface MRUVResult {
@@ -57,7 +60,7 @@ export interface MRUVResult {
   vfUnit: VelocityUnit;
   aUnit: AccelerationUnit;
   timeUnit: TimeUnit;
-  computedField: null;
+  computedField: ComputedField;
   controls?: DiagramControls;
 }
 
@@ -68,6 +71,8 @@ export interface MRUVDiagramModel {
   showViVector: boolean;
   showVfVector: boolean;
   showAccelerationVector: boolean;
+  showCharacterXi: boolean;
+  showCharacterXf: boolean;
   characterOrientation: 'left' | 'right' | 'none';
   xi: number;
   xf: number;
