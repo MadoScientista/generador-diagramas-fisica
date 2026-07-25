@@ -1,6 +1,7 @@
-# Reglas de diagramas MRU v2
+# Reglas de UI — Generador MRU v2
 
-Generador independiente del MRU v1. Comparte la misma logica de fisica y estetica del diagrama, con diferencias en la interfaz de usuario.
+> Generador independiente del MRU v1. Comparte la misma estetica del diagrama, con diferencias en la interfaz de usuario.
+> Las reglas de dominio físico están en `.opencode/skills/physics/mru/SKILL.md`.
 
 Ruta: `/generador/mru-v2`
 
@@ -15,11 +16,13 @@ Ruta: `/generador/mru-v2`
 | Selector de movil | No existe | Selector con opciones: Cuadrado, Persona, Bicicleta, Automovil |
 | Selector de fondo | No existe | Selector con opciones: Blanco, Parque, Ciudad, Playa |
 
-Todo lo demas es identico al v1: mismos inputs, mismas unidades, misma validacion, mismo motor fisico, mismo SVG generado.
+Todo lo demas es identico al v1: mismos inputs, mismos controles de visibilidad, mismo SVG generado.
 
 ---
 
 ## 2. Tarjetas desplegables (CollapsibleCard)
+
+> El patrón general (header + chevron, renderizado condicional) está en AGENTS.md > UI Conventions.
 
 Componente reutilizable (`src/ui/components/shared/CollapsibleCard.tsx`).
 
@@ -71,7 +74,7 @@ Los valores de movil y fondo se manejan con `useState` local en `MRUV2GeneratorP
 
 ### 3.4 Funcionalidad
 
-El selector de **movil** es funcional: el valor se pasa a `useMRUDiagram(controls, character)` y se propaga al motor, cambiando el tipo de personaje en el SVG generado (cuadrado, persona, bicicleta o automovil).
+El selector de **movil** es funcional: el valor se pasa a `useMRUDiagram(controls, character)` y se propaga al motor, cambiando el tipo de personaje en el SVG generado.
 
 El selector de **fondo** es solo estructura visual por ahora. El valor se almacena en estado local pero no se pasa al motor ni al renderer. La implementacion de fondos se hara en una futura iteracion.
 
@@ -88,16 +91,14 @@ El componente `DiagramControlsCard` acepta un prop opcional `showTitle` (default
 
 ## 5. Boton "Borrar datos"
 
-Resetea todos los campos a sus valores por defecto:
+> Comportamiento general: resetea todo a valores por defecto (AGENTS.md > UI Conventions).
 
-| Campo | Valor por defecto |
-|-------|-------------------|
-| $x_i$, $v$, $t$, $x_f$ | `''` (vacio) |
-| Unidades | `m`, `m/s`, `s`, `m` |
-| Controles de visibilidad | Todos activados |
+En MRU v2, además de los campos MRU, se resetean:
+
+| Campo adicional | Valor por defecto |
+|-----------------|-------------------|
 | Movil | `square` (Cuadrado) |
 | Fondo | `white` (Blanco) |
-| Resultado del diagrama | `null` |
 
 ---
 
@@ -116,8 +117,8 @@ Resetea todos los campos a sus valores por defecto:
 | Componente/Hook | Uso en v2 |
 |-----------------|-----------|
 | `useMRUDiagram(controls)` | Mismo hook, misma logica |
-| `useDiagramControls()` | Mismo hook, mismos toggles |
-| `useExportSVG(svg)` | Mismo hook, misma exportacion |
+| `useDiagramControls(defaults)` | Mismo hook, mismos toggles |
+| `useExportSVG(svg, filename)` | Mismo hook, misma exportacion |
 | `usePhysicsEngine()` | Mismo engine singleton |
 | `DiagramDataCard` | Card "Datos del diagrama" sin cambios |
 | `DiagramControlsCard` | Con `showTitle={false}` |

@@ -131,6 +131,7 @@ Mismas convenciones recomendadas que en cualquier dominio de cinemática de este
 | `NO_REAL_SOLUTION` | discriminante negativo en E3 |
 | `AMBIGUOUS_SIGN` | combinación `{vi,a,Δx}` o `{vf,a,Δx}` sin dato de contexto adicional para desambiguar signo |
 | `INCONSISTENT_OVERDETERMINED` | más inputs de los necesarios y no satisfacen las ecuaciones dentro de epsilon |
+| `EQUAL_VALUES` | pares que deben ser distintos (`xi=xf` o `vi=vf`) — ambos presentes en input con valores numéricamente iguales |
 
 ## 10. Fuera de alcance de este skill
 

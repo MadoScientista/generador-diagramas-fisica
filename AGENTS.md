@@ -3,7 +3,7 @@
 ## Commands
 
 - `npm run dev` — Vite dev server with HMR
-- `npm run build` — `tsc -b && vite build` (typecheck runs first; build fails on TS errors. execute only upon user request)
+- `npm run build` — `tsc -b && vite build` (typecheck runs first; build fails on TS errors)
 - `npm run lint` — ESLint (flat config, ignores `dist/`)
 - `npm run preview` — preview production build locally
 
@@ -44,6 +44,18 @@ Note: engines are **not** unified yet. They duplicate the pipeline logic with di
 - **Unit system:** `src/core/units.ts` provides `toSI`/`fromSI` converters. All physics math works in SI base units; display units are converted at input/output boundaries.
 - **Layout engine** (`src/core/layout-engine.ts`) maps physical values to screen coordinates using a viewport of 800x400 with 60px margins. It handles tick-gap enforcement and label collision avoidance.
 - **Display precision:** diagram labels show values rounded to a maximum of 3 decimal places. This is a presentation-layer constraint, not a physics-domain rule.
+
+## UI Conventions
+
+- **Page layout:** CSS Grid `grid-template-columns: 320px 1fr`, gap `1rem`, padding `2rem`.
+- **Cards:** `border: 1px solid #ddd; border-radius: 6px; padding: 1.5rem; background: white`, internal gap `0.5rem`.
+- **Empty/error states:** diagram container uses `height: 250px`.
+- **Label format:** `{identifier} = {value} {unit}` (e.g. `xi = 20 m`). Exception: origin label is `x = 0` (no unit).
+- **Label style:** Inter (Roboto fallback), sans-serif, no italic.
+- **Visibility table:** 3-column pattern (Etiqueta / Valor / Vector). Valor checkbox is disabled when Etiqueta is off. Vector visibility = AND(toggle, physical condition ≠ 0). MRUV adds a 4th column: Móvil (toggles character at xi and/or xf).
+- **CollapsibleCard pattern:** header with title + rotating chevron, content hidden via conditional rendering, used for secondary card sections (default closed).
+- **UI flow:** user fills inputs → "Calcular" resolves missing variable → auto-fill → diagram generates → toggles update SVG in real time → "Borrar datos" resets everything to defaults.
+- **Borrar datos:** resets all inputs, units, visibility toggles, character type, and diagram output to their defaults.
 
 ## Deployment
 
