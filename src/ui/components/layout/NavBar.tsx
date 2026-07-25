@@ -6,6 +6,7 @@ export function NavBar() {
       <NavLink to="/" end>Inicio</NavLink>
       <NavLink to="/generador/mru">MRU</NavLink>
       <NavLink to="/generador/mru-v2">MRU v2</NavLink>
+      <NavLink to="/generador/mruv">MRUV</NavLink>
     </nav>
   );
 }
