@@ -15,13 +15,11 @@ export const MRUModule: PhysicsModule = {
     return validateMRU(input);
   },
   solve(input: Record<string, number>): PhysicsResult {
-    const x0 = input['x0'];
-    const v = input['v'];
-    const t = input['t'];
     const result = resolveMRU({
-      x0,
-      v,
-      t,
+      x0: input['x0'],
+      v: input['v'],
+      t: input['t'],
+      xf: input['xf'],
       x0Unit: 'm',
       xfUnit: 'm',
       timeUnit: 's',

@@ -47,8 +47,8 @@ export function buildMRUScene(model: MRUDiagramModel): SceneGraph {
         visible: true,
         semanticRole: 'initial',
         physicalValue: toSI(model.x0, model.x0Unit, 'distance'),
-        showMarker: true,
-        showLabel: true,
+        showMarker: model.controls.xi.showLabel,
+        showLabel: model.controls.xi.showLabel,
       },
       {
         id: 'final-position',
@@ -56,8 +56,8 @@ export function buildMRUScene(model: MRUDiagramModel): SceneGraph {
         visible: true,
         semanticRole: 'final',
         physicalValue: toSI(model.xf, model.xfUnit, 'distance'),
-        showMarker: true,
-        showLabel: true,
+        showMarker: model.controls.xf.showLabel,
+        showLabel: model.controls.xf.showLabel,
       },
       {
         id: 'character',
