@@ -4,10 +4,11 @@ interface DiagramContainerProps {
   svg: string | null;
   error: string | null;
   errorDetail?: string | null;
+  filename?: string;
 }
 
-export function DiagramContainer({ svg, error, errorDetail }: DiagramContainerProps) {
-  const { exportSVG } = useExportSVG(svg);
+export function DiagramContainer({ svg, error, errorDetail, filename }: DiagramContainerProps) {
+  const { exportSVG } = useExportSVG(svg, filename);
 
   if (error) {
     return (

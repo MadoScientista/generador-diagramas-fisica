@@ -7,6 +7,7 @@ interface InputWithUnitProps {
   units: readonly string[];
   onChange: (value: string) => void;
   onUnitChange: (unit: string) => void;
+  disabled?: boolean;
 }
 
 export function InputWithUnit({
@@ -18,6 +19,7 @@ export function InputWithUnit({
   units,
   onChange,
   onUnitChange,
+  disabled,
 }: InputWithUnitProps) {
   return (
     <div className="form-field">
@@ -29,6 +31,8 @@ export function InputWithUnit({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
+          disabled={disabled}
+          autoComplete="off"
         />
         <select
           value={unit}
