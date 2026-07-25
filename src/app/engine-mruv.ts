@@ -28,9 +28,12 @@ interface PipelineResultExtended {
   detail?: string;
   svg?: string;
   layoutScene?: unknown;
-  computedField?: null;
+  computedField?: null | string;
+  computedFields?: null | (string | null)[];
   resolvedValues?: { xi: number; xf: number; vi: number; vf: number; a: number; t: number; dx: number };
 }
+
+const ALL_FIELDS = ['xi', 'xf', 'vi', 'vf', 'a', 't'];
 
 export class PhysicsDiagramEngineMRUV {
   private registry: ModuleRegistry;
@@ -42,7 +45,7 @@ export class PhysicsDiagramEngineMRUV {
   generate(opts: GenerateOptions): PipelineResultExtended {
     const { moduleId, rawInput, xiUnit, xfUnit, viUnit, vfUnit, aUnit, timeUnit, controls, characterType = 'square' } = opts;
 
-    const filledFields = ['xi', 'vi', 'a', 't'].filter(
+    const filledFields = ALL_FIELDS.filter(
       (k) => rawInput[k]?.trim() !== ''
     );
 
@@ -72,7 +75,9 @@ export class PhysicsDiagramEngineMRUV {
     try {
       resolved = resolveMRUV({
         xi: parseOptional('xi'),
+        xf: parseOptional('xf'),
         vi: parseOptional('vi'),
+        vf: parseOptional('vf'),
         a: parseOptional('a'),
         t: parseOptional('t'),
         xiUnit,
@@ -130,7 +135,8 @@ export class PhysicsDiagramEngineMRUV {
       type: 'success',
       svg,
       layoutScene,
-      computedField: null,
+      computedField: resolved.computedField,
+      computedFields: resolved.computedFields,
       resolvedValues: {
         xi: resolved.xi,
         xf: resolved.xf,
