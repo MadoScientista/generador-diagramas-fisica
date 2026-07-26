@@ -80,7 +80,7 @@ export function buildMRUVScene(model: MRUVDiagramModel): SceneGraph {
       {
         id: 'vi-vector',
         type: 'vector',
-        visible: model.showViVector && model.controls.vi.showVector,
+        visible: model.showViVector && model.controls.vi.showVector && model.showCharacterXi,
         vectorType: 'velocity',
         orientation: model.vi >= 0 ? 'right' : 'left',
         magnitude: model.vi,
@@ -121,7 +121,7 @@ export function buildMRUVScene(model: MRUVDiagramModel): SceneGraph {
       {
         id: 'label-vi',
         type: 'label',
-        visible: model.showViVector && model.controls.vi.showLabel,
+        visible: model.showViVector && model.controls.vi.showLabel && model.showCharacterXi,
         text: labelText('vi', model.controls.vi.showValue, model.vi, viUnit),
         semanticRole: 'label-vi',
       },

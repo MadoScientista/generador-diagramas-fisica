@@ -6,6 +6,7 @@ import type {
   Point,
   Layer,
   CharacterType,
+  VectorNode,
 } from './types.ts';
 import { getSpriteConfig } from './sprite-registry.ts';
 
@@ -258,7 +259,10 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
           labelX = ix + dir * offset;
           labelY = AXIS_Y - charH / 2 - 14;
         } else if (node.semanticRole === 'label-vi') {
-          const dir = ix <= fx ? 1 : -1;
+          const viVec = nodes.find(
+            (n): n is VectorNode => n.type === 'vector' && n.position === 'initial' && n.vectorType === 'velocity'
+          );
+          const dir = viVec?.orientation === 'left' ? -1 : 1;
           const baseOffset = charW / 2 + VECTOR_LENGTH / 2;
           const estHalfWidth = node.text.length * 4;
           const minOffset = charW / 2 + 10 + estHalfWidth;
