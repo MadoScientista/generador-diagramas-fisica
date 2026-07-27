@@ -19,6 +19,7 @@ const TICK_SIZE = 8;
 const VECTOR_LENGTH = 80;
 const POSITION_PADDING = 40;
 const MIN_TICK_GAP = 50;
+const AXIS_LINE_WIDTH = 760;
 const LABEL_OFFSET_Y = 22;
 const LABEL_GAP = 10;
 const DISPLACEMENT_Y_OFFSET = 55;
@@ -152,8 +153,8 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
 
     switch (node.type) {
       case 'axis':
-        pos = { x: MARGIN, y: AXIS_Y };
-        w = USABLE_WIDTH;
+        pos = { x: (VIEWPORT_WIDTH - AXIS_LINE_WIDTH) / 2, y: AXIS_Y };
+        w = AXIS_LINE_WIDTH;
         break;
 
       case 'origin': {

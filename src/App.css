@@ -378,13 +378,13 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 1rem;
-  max-height: 464px;
+  max-height: 474px;
 }
 
 .diagram-container svg {
   width: 100%;
   height: auto;
-  max-height: 350px;
+  max-height: 359px;
 }
 
 .diagram-container h3 {
@@ -422,7 +422,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 464px;
+  height: 474px;
   color: #888;
   font-style: italic;
 }
@@ -525,6 +525,13 @@ body {
 .graph-panel {
   display: flex;
   flex-direction: column;
+}
+
+.graph-placeholder {
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem 0;
 }
 
 .graph-tabs {

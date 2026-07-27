@@ -113,15 +113,15 @@ export function MRUVGeneratorPage() {
           errorDetail={result.errorDetail}
           filename="diagrama-mruv.svg"
         />
-        {graphData && xGraphSvg && vGraphSvg && aGraphSvg && (
-          <GraphPanel
-            graphs={[
-              { id: 'x', title: 'Posición', svg: xGraphSvg, filename: 'posicion-tiempo.svg' },
-              { id: 'v', title: 'Velocidad', svg: vGraphSvg, filename: 'velocidad-tiempo.svg' },
-              { id: 'a', title: 'Aceleración', svg: aGraphSvg, filename: 'aceleracion-tiempo.svg' },
-            ]}
-          />
-        )}
+        <GraphPanel
+          key={graphData && xGraphSvg && vGraphSvg && aGraphSvg ? 'ready' : 'empty'}
+          graphs={graphData && xGraphSvg && vGraphSvg && aGraphSvg ? [
+            { id: 'x', title: 'Posición', svg: xGraphSvg, filename: 'posicion-tiempo.svg' },
+            { id: 'v', title: 'Velocidad', svg: vGraphSvg, filename: 'velocidad-tiempo.svg' },
+            { id: 'a', title: 'Aceleración', svg: aGraphSvg, filename: 'aceleracion-tiempo.svg' },
+          ] : []}
+          disabled={!graphData || !xGraphSvg || !vGraphSvg || !aGraphSvg}
+        />
       </section>
     </div>
   );

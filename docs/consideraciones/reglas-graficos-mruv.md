@@ -36,7 +36,7 @@ conveniencia visual.
 
 - El eje horizontal es **siempre** el tiempo `t`, en los tres gráficos (x-t, v-t, a-t).
 - Esto implica que los tres gráficos son directamente comparables/alineables entre sí si la app
-  los muestra simultáneamente, aunque cada uno vive en su propia tarjeta desplegable (§7).
+  los muestra simultáneamente; conviven en una sola tarjeta con pestañas (§7).
 
 ## 4. Unidades
 
@@ -50,20 +50,13 @@ conveniencia visual.
 
 ## 5. Puntos de interés a marcar
 
-**Único punto de interés definido:** cambio de sentido de la velocidad.
+Actualmente **no se marca ningún punto de interés** en los gráficos.
 
-- Ocurre en el instante `τ* = -vi / a` (derivado de E1 del skill de dominio: `v(τ*) = 0`).
-- Se marca **solo si** `τ* ∈ (0, t)` — es decir, el cambio de sentido ocurre estrictamente
-  dentro del intervalo graficado. Si `τ* ≤ 0`, `τ* ≥ t`, o `a = 0` (no hay cambio de sentido
-  posible), no se marca ningún punto.
-- El punto se marca en **los tres gráficos** en el mismo instante `τ*`:
-  - En x-t: es el vértice de la parábola (`x(τ*)`).
-  - En v-t: es el cruce por cero (`v(τ*) = 0`).
-  - En a-t: no cambia la forma de la curva (a es constante), pero se marca igualmente el
-    instante `τ*` como referencia cruzada con los otros dos gráficos.
-- Si el resultado del skill de dominio llegó marcado como `AMBIGUOUS_SIGN` (§5 de
-  `mruv-physics-domain`) y aún no fue resuelto por el flag de contexto, **no se grafica** —
-  ese caso debe resolverse en la capa de dominio antes de llegar aquí.
+- El cálculo de `τ*` (cambio de sentido de la velocidad: `τ* = -vi / a`) se realiza en
+  `computeGraphData`, pero el resultado siempre se fuerza a `null`, de modo que no se
+  renderiza ningún marcador en los tres gráficos.
+- Esta decisión es reversible: si en el futuro se desea marcar `τ*`, basta con devolver el
+  valor calculado en vez de `null` en `graph-helpers.ts`.
 
 *(Puntos de interés adicionales — como extremos `(0, xi)`/`(t, xf)`, o cruces de a=0 en
 movimiento por tramos — no están definidos en esta versión del documento y no deben agregarse
@@ -77,23 +70,32 @@ sin actualizarlo explícitamente.)*
 
 ## 7. Estructura de presentación
 
-- Cada gráfico vive dentro de **su propia tarjeta desplegable** (collapsible/accordion) —
-  un total de 3 tarjetas independientes, una por variable graficada.
-- Las tarjetas no están anidadas entre sí ni comparten contenedor visual más allá del layout
-  general de la página.
-- Estado por defecto (expandida/colapsada al cargar) no está definido en esta versión — debe
-  decidirse explícitamente si la app lo requiere.
+- Los tres gráficos (x-t, v-t, a-t) conviven dentro de **una sola tarjeta desplegable**
+  (`CollapsibleCard` con título "Gráficos") usando un sistema de **pestañas** (tabs).
+- Las pestañas muestran etiquetas cortas: "Posición", "Velocidad", "Aceleración".
+- Solo un gráfico es visible a la vez; el activo por defecto es la primera pestaña
+  ("Posición").
+- Estado por defecto: **colapsada** (igual que otros `CollapsibleCards` del proyecto).
 
-## 8. Títulos de las tarjetas
+### Estado sin datos
 
-| Gráfico | Título exacto |
+- La tarjeta "Gráficos" **siempre es visible** en la página (no se condiciona su renderizado).
+- Cuando no hay datos resueltos (`disabled=true`), el body de la tarjeta muestra la leyenda
+  "Ingrese datos del diagrama" en gris claro / italic.
+- Cuando los datos están disponibles, se muestran las pestañas con los gráficos y la tarjeta
+  se puede desplegar normalmente.
+
+## 8. Títulos y etiquetas
+
+| Elemento | Texto |
 |---|---|
-| x vs t | `Posición en función del tiempo` |
-| v vs t | `Velocidad en función del tiempo` |
-| a vs t | `Aceleración en función del tiempo` |
+| Tarjeta (CollapsibleCard) | `Gráficos` |
+| Pestaña x vs t | `Posición` |
+| Pestaña v vs t | `Velocidad` |
+| Pestaña a vs t | `Aceleración` |
+| Placeholder (sin datos) | `Ingrese datos del diagrama` |
 
-Los títulos se usan tal cual, sin abreviar variables (`x`, `v`, `a`) ni agregar unidades en el
-título mismo — las unidades se muestran en los ejes del gráfico, no en el título de la tarjeta.
+Las unidades se muestran en los ejes del gráfico, no en los títulos ni etiquetas de pestaña.
 
 ## 9. Fuera de alcance de este documento
 
@@ -114,12 +116,13 @@ de inferir una solución de diseño no especificada aquí.
 |---|---|
 | Renderizado de curva | Línea continua (`<polyline>`), no puntos individuales |
 | Muestreo temporal | 100 puntos equiespaciados entre 0 y t |
-| τ* renderizado | Círculo relleno + línea vertical punteada + label `τ* = {valor} s` |
-| Estado por defecto de tarjetas | Colapsadas (igual que otros CollapsibleCards del proyecto) |
-| Ubicación en la página | Nueva `section` separada debajo de `.diagram-section` |
-| Visibilidad de sección | Solo cuando `result.type === 'success'` con `resolvedValues` |
+| τ* renderizado | Deshabilitado — `tauStar` siempre se devuelve como `null` |
+| Estado por defecto de tarjeta | Colapsada (igual que otros CollapsibleCards del proyecto) |
+| Ubicación en la página | Dentro de `.diagram-section`, debajo de `DiagramContainer` |
+| Visibilidad de sección | Siempre visible; cuando `disabled` muestra placeholder "Ingrese datos del diagrama" |
 | Estilo de curva | Stroke `#2563eb`, stroke-width `2`, sin fill |
-| Ejes | Con flechas, etiquetas en español |
+| Ejes | Con flechas, color `#000`, etiquetas en español |
+| Ticks de ejes | `computeNiceTicks()` — múltiplos de 5 exclusivamente; `0` se excluye del eje horizontal, siempre incluido en el eje vertical |
 | Tamaño SVG | Fijo 400×400 (viewBox, no responsive) |
-| Exportación | Cada gráfico con su propio botón "Exportar" |
+| Exportación | Cada gráfico con su propio botón "Exportar", posicionado absolute top-right del panel |
 | Caso a=0 | Mostrar igualmente (curvas lineales/constantes) |

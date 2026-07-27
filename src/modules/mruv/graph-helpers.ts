@@ -57,5 +57,5 @@ export function computeGraphData(resolved: {
     }
   }
 
-  return { points, tauStar };
+  return { points, tauStar: null };
 }
