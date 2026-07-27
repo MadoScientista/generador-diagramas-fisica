@@ -15,16 +15,10 @@ export function inferMRUV(result: MRUVResult & { controls?: DiagramControls; cha
   let direction: 'left' | 'right' | 'none';
   let characterOrientation: 'left' | 'right' | 'none';
 
-  if (result.vi > 0) {
+  if (result.dx > 0) {
     direction = 'right';
     characterOrientation = 'right';
-  } else if (result.vi < 0) {
-    direction = 'left';
-    characterOrientation = 'left';
-  } else if (result.a > 0) {
-    direction = 'right';
-    characterOrientation = 'right';
-  } else if (result.a < 0) {
+  } else if (result.dx < 0) {
     direction = 'left';
     characterOrientation = 'left';
   } else {

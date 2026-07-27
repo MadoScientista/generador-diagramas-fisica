@@ -12,7 +12,7 @@ import { getSpriteConfig } from './sprite-registry.ts';
 
 const VIEWPORT_WIDTH = 800;
 const VIEWPORT_HEIGHT = 400;
-const MARGIN = 60;
+const MARGIN = 120;
 const USABLE_WIDTH = VIEWPORT_WIDTH - 2 * MARGIN;
 const AXIS_Y = VIEWPORT_HEIGHT / 2 + 40;
 const TICK_SIZE = 8;
@@ -193,7 +193,7 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
         }
         const arrowLen = node.orientation === 'left' ? -VECTOR_LENGTH : VECTOR_LENGTH;
         let startX: number;
-        if (vectorPosition === 'center' || (vectorPosition === 'final' && node.vectorType === 'velocity')) {
+        if (vectorPosition === 'center') {
           startX = refX - arrowLen / 2;
         } else {
           startX = node.orientation === 'right'
@@ -202,9 +202,7 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
         }
         const vy = node.vectorType === 'acceleration'
           ? AXIS_Y - charH - 18
-          : vectorPosition === 'final'
-            ? AXIS_Y - charH - 14
-            : AXIS_Y - charH / 2;
+          : AXIS_Y - charH / 2;
         pos = { x: startX, y: vy };
         w = arrowLen;
         break;
@@ -270,8 +268,16 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
           labelX = ix + dir * offset;
           labelY = AXIS_Y - charH / 2 - 14;
         } else if (node.semanticRole === 'label-vf') {
-          labelX = fx;
-          labelY = AXIS_Y - charH - 30;
+          const vfVec = nodes.find(
+            (n): n is VectorNode => n.type === 'vector' && n.position === 'final' && n.vectorType === 'velocity'
+          );
+          const dir = vfVec?.orientation === 'left' ? -1 : 1;
+          const baseOffset = charW / 2 + VECTOR_LENGTH / 2;
+          const estHalfWidth = node.text.length * 4;
+          const minOffset = charW / 2 + 10 + estHalfWidth;
+          const offset = Math.max(baseOffset, minOffset);
+          labelX = fx + dir * offset;
+          labelY = AXIS_Y - charH / 2 - 14;
         } else if (node.semanticRole === 'label-a') {
           labelX = (ix + fx) / 2;
           labelY = AXIS_Y - charH - LABEL_GAP - 25;

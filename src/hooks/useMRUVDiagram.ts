@@ -5,6 +5,16 @@ import type { PipelineResult, CharacterType } from '../core/types.ts';
 import type { DistanceUnit, TimeUnit, VelocityUnit, AccelerationUnit } from '../core/units.ts';
 import type { DiagramControls } from '../modules/mruv/types.ts';
 
+interface ResolvedValues {
+  xi: number;
+  xf: number;
+  vi: number;
+  vf: number;
+  a: number;
+  t: number;
+  dx: number;
+}
+
 const ALL_FIELDS = ['xi', 'xf', 'vi', 'vf', 'a', 't'] as const;
 
 export function useMRUVDiagram(controls: DiagramControls, characterType: CharacterType = 'square') {
@@ -24,6 +34,7 @@ export function useMRUVDiagram(controls: DiagramControls, characterType: Charact
   const [timeUnit, setTimeUnit] = useState<TimeUnit>('s');
   const [result, setResult] = useState<PipelineResult | null>(null);
   const [computedValues, setComputedValues] = useState<Record<string, string> | null>(null);
+  const [resolvedValues, setResolvedValues] = useState<ResolvedValues | null>(null);
 
   const prevUnitsRef = useRef({ xiUnit, xfUnit, viUnit, vfUnit, aUnit, timeUnit });
 
@@ -58,6 +69,7 @@ export function useMRUVDiagram(controls: DiagramControls, characterType: Charact
     setTimeUnit('s');
     setResult(null);
     setComputedValues(null);
+    setResolvedValues(null);
     prevUnitsRef.current = { xiUnit: 'm', xfUnit: 'm', viUnit: 'm/s', vfUnit: 'm/s', aUnit: 'm/s^2', timeUnit: 's' };
   }, []);
 
@@ -106,8 +118,18 @@ export function useMRUVDiagram(controls: DiagramControls, characterType: Charact
         if (cf === 't') computed.t = formatValue(res.resolvedValues.t);
       }
       setComputedValues(computed);
+      setResolvedValues({
+        xi: res.resolvedValues.xi,
+        xf: res.resolvedValues.xf,
+        vi: res.resolvedValues.vi,
+        vf: res.resolvedValues.vf,
+        a: res.resolvedValues.a,
+        t: res.resolvedValues.t,
+        dx: res.resolvedValues.dx,
+      });
     } else {
       setComputedValues(null);
+      setResolvedValues(null);
     }
 
     setResult(res as PipelineResult);
@@ -147,6 +169,7 @@ export function useMRUVDiagram(controls: DiagramControls, characterType: Charact
   return {
     values: { xi, xf, vi, vf, a, t },
     computedValues,
+    resolvedValues,
     units: { xiUnit, xfUnit, viUnit, vfUnit, aUnit, timeUnit },
     result: { svg, error, errorDetail },
     handleChange,

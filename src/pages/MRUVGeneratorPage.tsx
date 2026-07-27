@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useDiagramControls } from '../hooks/useDiagramControls.ts';
 import { useMRUVDiagram } from '../hooks/useMRUVDiagram.ts';
 import { DiagramDataCardMRUV } from '../ui/components/form/DiagramDataCardMRUV.tsx';
@@ -6,6 +6,11 @@ import { DiagramControlsCardMRUV } from '../ui/components/form/DiagramControlsCa
 import { DiagramContainer } from '../ui/components/diagram/DiagramContainer.tsx';
 import { CollapsibleCard } from '../ui/components/shared/CollapsibleCard.tsx';
 import { DiagramAppearanceCard } from '../ui/components/form/DiagramAppearanceCard.tsx';
+import { GraphPanel } from '../ui/components/diagram/GraphPanel.tsx';
+import { AccelerationTimeGraph } from '../ui/components/diagram/graphs/AccelerationTimeGraph.tsx';
+import { VelocityTimeGraph } from '../ui/components/diagram/graphs/VelocityTimeGraph.tsx';
+import { PositionTimeGraph } from '../ui/components/diagram/graphs/PositionTimeGraph.tsx';
+import { computeGraphData } from '../modules/mruv/graph-helpers.ts';
 import type { CharacterType, BackgroundType } from '../ui/components/form/DiagramAppearanceCard.tsx';
 import type { DiagramControls } from '../modules/mruv/types.ts';
 
@@ -28,12 +33,33 @@ export function MRUVGeneratorPage() {
   const {
     values,
     computedValues,
+    resolvedValues,
     units,
     result,
     handleChange,
     handleUnitChange,
     clearAll,
   } = useMRUVDiagram(controls, character);
+
+  const graphData = useMemo(
+    () => (resolvedValues ? computeGraphData(resolvedValues) : null),
+    [resolvedValues]
+  );
+
+  const aGraphSvg = useMemo(
+    () => (graphData ? AccelerationTimeGraph({ data: graphData }) : null),
+    [graphData]
+  );
+
+  const vGraphSvg = useMemo(
+    () => (graphData ? VelocityTimeGraph({ data: graphData }) : null),
+    [graphData]
+  );
+
+  const xGraphSvg = useMemo(
+    () => (graphData ? PositionTimeGraph({ data: graphData }) : null),
+    [graphData]
+  );
 
   const handleClear = () => {
     clearAll();
@@ -87,6 +113,15 @@ export function MRUVGeneratorPage() {
           errorDetail={result.errorDetail}
           filename="diagrama-mruv.svg"
         />
+        {graphData && xGraphSvg && vGraphSvg && aGraphSvg && (
+          <GraphPanel
+            graphs={[
+              { id: 'x', title: 'Posición', svg: xGraphSvg, filename: 'posicion-tiempo.svg' },
+              { id: 'v', title: 'Velocidad', svg: vGraphSvg, filename: 'velocidad-tiempo.svg' },
+              { id: 'a', title: 'Aceleración', svg: aGraphSvg, filename: 'aceleracion-tiempo.svg' },
+            ]}
+          />
+        )}
       </section>
     </div>
   );

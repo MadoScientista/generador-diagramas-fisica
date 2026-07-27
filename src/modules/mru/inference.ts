@@ -13,11 +13,11 @@ export function inferMRU(result: MRUResult & { controls?: DiagramControls; chara
   let characterOrientation: 'left' | 'right' | 'none';
   let showVelocityVector: boolean;
 
-  if (result.v > 0) {
+  if (result.dx > 0) {
     direction = 'right';
     characterOrientation = 'right';
     showVelocityVector = true;
-  } else if (result.v < 0) {
+  } else if (result.dx < 0) {
     direction = 'left';
     characterOrientation = 'left';
     showVelocityVector = true;
