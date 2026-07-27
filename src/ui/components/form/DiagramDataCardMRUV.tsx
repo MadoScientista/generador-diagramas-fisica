@@ -7,15 +7,11 @@ interface DiagramDataCardMRUVProps {
   computedValues: Record<string, string> | null;
   onChange: (field: 'xi' | 'xf' | 'vi' | 'vf' | 'a' | 't', value: string) => void;
   xiUnit: DistanceUnit;
-  xfUnit: DistanceUnit;
   viUnit: VelocityUnit;
-  vfUnit: VelocityUnit;
   aUnit: AccelerationUnit;
   timeUnit: TimeUnit;
   onXiUnitChange: (unit: DistanceUnit) => void;
-  onXfUnitChange: (unit: DistanceUnit) => void;
   onViUnitChange: (unit: VelocityUnit) => void;
-  onVfUnitChange: (unit: VelocityUnit) => void;
   onAUnitChange: (unit: AccelerationUnit) => void;
   onTimeUnitChange: (unit: TimeUnit) => void;
   onClear: () => void;
@@ -26,15 +22,11 @@ export function DiagramDataCardMRUV({
   computedValues,
   onChange,
   xiUnit,
-  xfUnit,
   viUnit,
-  vfUnit,
   aUnit,
   timeUnit,
   onXiUnitChange,
-  onXfUnitChange,
   onViUnitChange,
-  onVfUnitChange,
   onAUnitChange,
   onTimeUnitChange,
   onClear,

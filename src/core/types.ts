@@ -64,7 +64,7 @@ export interface VectorNode extends NodeBase {
   vectorType: VectorType;
   orientation: Orientation;
   magnitude: number;
-  position?: 'initial' | 'final';
+  position?: 'initial' | 'final' | 'center';
 }
 
 export interface LabelNode extends NodeBase {

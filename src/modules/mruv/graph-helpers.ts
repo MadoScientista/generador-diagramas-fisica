@@ -49,13 +49,5 @@ export function computeGraphData(resolved: {
     };
   });
 
-  let tauStar: number | null = null;
-  if (a !== 0) {
-    const candidate = -vi / a;
-    if (candidate > 0 && candidate < t) {
-      tauStar = candidate;
-    }
-  }
-
   return { points, tauStar: null };
 }

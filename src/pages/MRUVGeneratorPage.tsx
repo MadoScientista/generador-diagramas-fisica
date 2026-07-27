@@ -76,15 +76,11 @@ export function MRUVGeneratorPage() {
           computedValues={computedValues}
           onChange={handleChange}
           xiUnit={units.xiUnit}
-          xfUnit={units.xfUnit}
           viUnit={units.viUnit}
-          vfUnit={units.vfUnit}
           aUnit={units.aUnit}
           timeUnit={units.timeUnit}
           onXiUnitChange={(unit) => handleUnitChange('xiUnit', unit)}
-          onXfUnitChange={(unit) => handleUnitChange('xfUnit', unit)}
           onViUnitChange={(unit) => handleUnitChange('viUnit', unit)}
-          onVfUnitChange={(unit) => handleUnitChange('vfUnit', unit)}
           onAUnitChange={(unit) => handleUnitChange('aUnit', unit)}
           onTimeUnitChange={(unit) => handleUnitChange('timeUnit', unit)}
           onClear={handleClear}
