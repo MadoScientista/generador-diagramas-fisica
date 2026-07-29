@@ -13,6 +13,10 @@ const TIME_TO_S: Record<TimeUnit, number> = { s: 1, min: 60, h: 3600 };
 const VELOCITY_TO_MS: Record<VelocityUnit, number> = { 'm/s': 1, 'km/h': 1 / 3.6 };
 const ACCELERATION_TO_MS2: Record<AccelerationUnit, number> = { 'm/s^2': 1, 'km/h^2': 1 / 12960 };
 
+export function displayUnit(unit: string): string {
+  return unit.replace('^2', '\u00B2');
+}
+
 export function toSI(
   value: number,
   unit: DistanceUnit | TimeUnit | VelocityUnit | AccelerationUnit,

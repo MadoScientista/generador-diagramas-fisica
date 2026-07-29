@@ -67,9 +67,16 @@ export interface VectorNode extends NodeBase {
   position?: 'initial' | 'final' | 'center';
 }
 
+export interface TextSegment {
+  text: string;
+  dy: number;
+  fontSize: number;
+}
+
 export interface LabelNode extends NodeBase {
   type: 'label';
   text: string;
+  segments: TextSegment[];
   semanticRole: SemanticRole;
 }
 

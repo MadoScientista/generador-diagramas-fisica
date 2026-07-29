@@ -1,18 +1,20 @@
-import type { SceneGraph } from '../../core/types.ts';
-import { formatValue } from '../../core/format.ts';
+import type { SceneGraph, SemanticRole } from '../../core/types.ts';
+import { buildLabelSegments } from '../../core/format.ts';
 import { toSI } from '../../core/units.ts';
 import type { MRUVDiagramModel } from './types.ts';
 
-function labelText(
-  prefix: string,
-  show: boolean,
+function mkLabel(
+  id: string,
+  semanticRole: SemanticRole,
+  visible: boolean,
   value: number,
-  unit: string
-): string {
-  if (show) {
-    return `${prefix} = ${formatValue(value)} ${unit}`;
-  }
-  return prefix;
+  unit: string,
+  control: { showValue: boolean }
+) {
+  if (!visible) return [];
+  const prefix = id.replace('label-', '');
+  const { segments, text } = buildLabelSegments(prefix, control.showValue, value, unit);
+  return [{ id, type: 'label' as const, visible: true, text, segments, semanticRole }];
 }
 
 export function buildMRUVScene(model: MRUVDiagramModel): SceneGraph {
@@ -104,55 +106,13 @@ export function buildMRUVScene(model: MRUVDiagramModel): SceneGraph {
         magnitude: model.a,
         position: 'center',
       },
-      {
-        id: 'label-xi',
-        type: 'label',
-        visible: model.controls.xi.showLabel,
-        text: labelText('xi', model.controls.xi.showValue, model.xi, xiUnit),
-        semanticRole: 'label-xi',
-      },
-      {
-        id: 'label-xf',
-        type: 'label',
-        visible: model.controls.xf.showLabel,
-        text: labelText('xf', model.controls.xf.showValue, model.xf, xfUnit),
-        semanticRole: 'label-xf',
-      },
-      {
-        id: 'label-vi',
-        type: 'label',
-        visible: model.showViVector && model.controls.vi.showLabel && model.showCharacterXi,
-        text: labelText('vi', model.controls.vi.showValue, model.vi, viUnit),
-        semanticRole: 'label-vi',
-      },
-      {
-        id: 'label-vf',
-        type: 'label',
-        visible: model.showVfVector && model.controls.vf.showLabel && model.showCharacterXf,
-        text: labelText('vf', model.controls.vf.showValue, model.vf, vfUnit),
-        semanticRole: 'label-vf',
-      },
-      {
-        id: 'label-a',
-        type: 'label',
-        visible: model.showAccelerationVector && model.controls.a.showLabel,
-        text: labelText('a', model.controls.a.showValue, model.a, aUnit),
-        semanticRole: 'label-a',
-      },
-      {
-        id: 'label-t',
-        type: 'label',
-        visible: model.controls.t.showLabel,
-        text: labelText('t', model.controls.t.showValue, model.t, timeUnit),
-        semanticRole: 'label-t',
-      },
-      {
-        id: 'label-dx',
-        type: 'label',
-        visible: model.hasDisplacement && model.controls.dx.showLabel,
-        text: labelText('\u0394x', model.controls.dx.showValue, model.dx, xiUnit),
-        semanticRole: 'label-dx',
-      },
+      ...mkLabel('label-xi', 'label-xi', model.controls.xi.showLabel, model.xi, xiUnit, model.controls.xi),
+      ...mkLabel('label-xf', 'label-xf', model.controls.xf.showLabel, model.xf, xfUnit, model.controls.xf),
+      ...mkLabel('label-vi', 'label-vi', model.showViVector && model.controls.vi.showLabel && model.showCharacterXi, model.vi, viUnit, model.controls.vi),
+      ...mkLabel('label-vf', 'label-vf', model.showVfVector && model.controls.vf.showLabel && model.showCharacterXf, model.vf, vfUnit, model.controls.vf),
+      ...mkLabel('label-a', 'label-a', model.showAccelerationVector && model.controls.a.showLabel, model.a, aUnit, model.controls.a),
+      ...mkLabel('label-t', 'label-t', model.controls.t.showLabel, model.t, timeUnit, model.controls.t),
+      ...mkLabel('label-dx', 'label-dx', model.hasDisplacement && model.controls.dx.showLabel, model.dx, xiUnit, model.controls.dx),
       {
         id: 'displacement-arrow',
         type: 'displacement-arrow',

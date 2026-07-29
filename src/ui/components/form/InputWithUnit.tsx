@@ -1,3 +1,5 @@
+import { displayUnit } from '../../../core/units.ts';
+
 interface InputWithUnitProps {
   id: string;
   label: string;
@@ -39,7 +41,7 @@ export function InputWithUnit({
           onChange={(e) => onUnitChange(e.target.value)}
         >
           {units.map((u) => (
-            <option key={u} value={u}>{u}</option>
+            <option key={u} value={u}>{displayUnit(u)}</option>
           ))}
         </select>
       </div>

@@ -98,6 +98,17 @@ function renderDisplacementArrow(node: PositionedNode): string {
     <polygon points="${endX},${y} ${endX + arrowSize},${y - arrowSize / 2} ${endX + arrowSize},${y + arrowSize / 2}" fill="black" />`;
 }
 
+function renderSegments(segments: import('./types.ts').TextSegment[]): string {
+  let currentDy = 0;
+  return segments
+    .map((seg) => {
+      const relDy = seg.dy - currentDy;
+      currentDy = seg.dy;
+      return `<tspan dy="${relDy}" font-size="${seg.fontSize}">${escapeXml(seg.text)}</tspan>`;
+    })
+    .join('');
+}
+
 function renderLabel(node: PositionedNode): string {
   const { position, node: originalNode } = node;
   const x = position.x;
@@ -105,8 +116,11 @@ function renderLabel(node: PositionedNode): string {
 
   if (originalNode.type !== 'label') return '';
 
+  const segments = originalNode.segments;
+  const tspans = renderSegments(segments);
+
   return `
-    <text x="${x}" y="${y}" font-family="Inter, Roboto, sans-serif" font-size="14" fill="black" text-anchor="middle">${escapeXml(originalNode.text)}</text>`;
+    <text x="${x}" y="${y}" font-family="Inter, Roboto, sans-serif" font-size="14" fill="black" text-anchor="middle">${tspans}</text>`;
 }
 
 function escapeXml(str: string): string {

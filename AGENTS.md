@@ -35,6 +35,8 @@ Note: engines are **not** unified yet. They duplicate the pipeline logic with di
 
 **Routing:** `HashRouter` with routes defined in `src/router.tsx`. Three generator pages under `/generador/*`.
 
+> **Note:** MRU and MRU v2 are excluded from navigation (NavBar/HomePage) since MRUV covers all their functionality. The code, routes, and pages remain in the repo and are still accessible via direct URL — only the UI entry points were removed.
+
 ## Conventions
 
 - Do not modify anything unless the user explicitly indicates otherwise.
