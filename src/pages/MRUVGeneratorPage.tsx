@@ -3,10 +3,9 @@ import { useDiagramControls } from '../hooks/useDiagramControls.ts';
 import { useMRUVDiagram } from '../hooks/useMRUVDiagram.ts';
 import { DiagramDataCardMRUV } from '../ui/components/form/DiagramDataCardMRUV.tsx';
 import { DiagramControlsCardMRUV } from '../ui/components/form/DiagramControlsCardMRUV.tsx';
-import { DiagramContainer } from '../ui/components/diagram/DiagramContainer.tsx';
 import { CollapsibleCard } from '../ui/components/shared/CollapsibleCard.tsx';
 import { DiagramAppearanceCard } from '../ui/components/form/DiagramAppearanceCard.tsx';
-import { GraphPanel } from '../ui/components/diagram/GraphPanel.tsx';
+import { DiagramSection } from '../ui/components/diagram/DiagramSection.tsx';
 import { AccelerationTimeGraph } from '../ui/components/diagram/graphs/AccelerationTimeGraph.tsx';
 import { VelocityTimeGraph } from '../ui/components/diagram/graphs/VelocityTimeGraph.tsx';
 import { PositionTimeGraph } from '../ui/components/diagram/graphs/PositionTimeGraph.tsx';
@@ -21,7 +20,7 @@ const MRUV_DEFAULTS: DiagramControls = {
   vf: { showLabel: true, showValue: true, showVector: true },
   a: { showLabel: true, showValue: true, showVector: true },
   t: { showLabel: true, showValue: true },
-  dx: { showLabel: true, showValue: true, showVector: true },
+  dx: { showLabel: false, showValue: false, showVector: false },
 };
 
 export function MRUVGeneratorPage() {
@@ -71,20 +70,23 @@ export function MRUVGeneratorPage() {
   return (
     <div className="generator-page">
       <section className="input-section">
-        <DiagramDataCardMRUV
-          values={values}
-          computedValues={computedValues}
-          onChange={handleChange}
-          xiUnit={units.xiUnit}
-          viUnit={units.viUnit}
-          aUnit={units.aUnit}
-          timeUnit={units.timeUnit}
-          onXiUnitChange={(unit) => handleUnitChange('xiUnit', unit)}
-          onViUnitChange={(unit) => handleUnitChange('viUnit', unit)}
-          onAUnitChange={(unit) => handleUnitChange('aUnit', unit)}
-          onTimeUnitChange={(unit) => handleUnitChange('timeUnit', unit)}
-          onClear={handleClear}
-        />
+        <CollapsibleCard title="Datos del diagrama" defaultOpen={true}>
+          <DiagramDataCardMRUV
+            values={values}
+            computedValues={computedValues}
+            onChange={handleChange}
+            xiUnit={units.xiUnit}
+            viUnit={units.viUnit}
+            aUnit={units.aUnit}
+            timeUnit={units.timeUnit}
+            onXiUnitChange={(unit) => handleUnitChange('xiUnit', unit)}
+            onViUnitChange={(unit) => handleUnitChange('viUnit', unit)}
+            onAUnitChange={(unit) => handleUnitChange('aUnit', unit)}
+            onTimeUnitChange={(unit) => handleUnitChange('timeUnit', unit)}
+            onClear={handleClear}
+            showTitle={false}
+          />
+        </CollapsibleCard>
         <CollapsibleCard title="Elementos del diagrama" defaultOpen={false}>
           <DiagramControlsCardMRUV
             controls={controls}
@@ -103,20 +105,18 @@ export function MRUVGeneratorPage() {
       </section>
 
       <section className="diagram-section">
-        <DiagramContainer
+        <DiagramSection
+          key={graphData && xGraphSvg && vGraphSvg && aGraphSvg ? 'ready' : 'empty'}
           svg={result.svg}
           error={result.error}
           errorDetail={result.errorDetail}
-          filename="diagrama-mruv.svg"
-        />
-        <GraphPanel
-          key={graphData && xGraphSvg && vGraphSvg && aGraphSvg ? 'ready' : 'empty'}
+          diagramFilename="diagrama-mruv.svg"
           graphs={graphData && xGraphSvg && vGraphSvg && aGraphSvg ? [
             { id: 'x', title: 'Posición', svg: xGraphSvg, filename: 'posicion-tiempo.svg' },
             { id: 'v', title: 'Velocidad', svg: vGraphSvg, filename: 'velocidad-tiempo.svg' },
             { id: 'a', title: 'Aceleración', svg: aGraphSvg, filename: 'aceleracion-tiempo.svg' },
           ] : []}
-          disabled={!graphData || !xGraphSvg || !vGraphSvg || !aGraphSvg}
+          graphsDisabled={!graphData || !xGraphSvg || !vGraphSvg || !aGraphSvg}
         />
       </section>
     </div>

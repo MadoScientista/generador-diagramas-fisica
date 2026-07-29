@@ -1,7 +1,7 @@
 # Reglas de UI — Generador MRU v2
 
 > Generador independiente del MRU v1. Comparte la misma estetica del diagrama, con diferencias en la interfaz de usuario.
-> Las reglas de dominio físico están en `.opencode/skills/physics/mru/SKILL.md`.
+> Las reglas de dominio físico están en `.opencode/skills/physics/mru-physics-domain/SKILL.md`.
 
 Ruta: `/generador/mru-v2`
 

@@ -230,8 +230,7 @@ body {
 
 /* ── Buttons ─────────────────────────────────────────── */
 
-.mru-form button[type='submit'],
-.export-button {
+.mru-form button[type='submit'] {
   padding: 0.6rem 1.2rem;
   background: #2563eb;
   color: white;
@@ -243,15 +242,37 @@ body {
   transition: background 0.15s;
 }
 
-.mru-form button[type='submit']:hover,
-.export-button:hover {
+.mru-form button[type='submit']:hover {
   background: #1d4ed8;
 }
 
-.mru-form button[type='submit']:disabled,
-.export-button:disabled {
+.mru-form button[type='submit']:disabled {
   background: #94a3b8;
   cursor: not-allowed;
+}
+
+.export-button {
+  padding: 0.6rem 1.2rem;
+  background: transparent;
+  color: #333;
+  border: 1px solid #d4d4d4;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.export-button:hover {
+  background: #f5f5f5;
+  border-color: #bbb;
+}
+
+.export-button:disabled {
+  color: #bbb;
+  border-color: #e5e5e5;
+  cursor: not-allowed;
+  background: transparent;
 }
 
 .clear-button {
@@ -370,6 +391,94 @@ body {
   align-self: start;
 }
 
+.diagram-section-card {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1rem;
+}
+
+.card-header .export-button {
+  margin-left: auto;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.view-switcher-inner {
+  display: flex;
+  background: #f4f3ef;
+  border: 1px solid #e5e3da;
+  border-radius: 999px;
+  padding: 3px;
+}
+
+.view-tab {
+  padding: 0.35rem 1.25rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 13px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-weight: 500;
+  color: #6b6a63;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.view-tab.active {
+  background: white;
+  color: #1a1a18;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.view-tab:not(.active):hover {
+  color: #1a1a18;
+}
+
+.diagram-section-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 440px;
+}
+
+.diagram-section-svg {
+  flex: 1;
+  width: 100%;
+}
+
+.diagram-section-svg > div {
+  width: 100%;
+  height: 100%;
+}
+
+.diagram-section-svg svg {
+  width: 100%;
+  height: 100%;
+}
+
+.diagram-section-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 474px;
+  color: #888;
+  font-style: italic;
+  padding: 2rem;
+}
+
 .diagram-container {
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -404,7 +513,7 @@ body {
   padding-left: 2rem;
 }
 
-.export-button {
+.diagram-container .export-button {
   margin-right: 2rem;
 }
 
@@ -479,7 +588,10 @@ body {
 }
 
 .collapsible-card-body {
-  padding: 0 1.5rem 1.5rem;
+  padding: 0.75rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 /* ── Appearance Card ─────────────────────────────────── */
@@ -522,11 +634,6 @@ body {
 
 /* ── Graph Panel ────────────────────────────────────── */
 
-.graph-panel {
-  display: flex;
-  flex-direction: column;
-}
-
 .graph-placeholder {
   color: #999;
   font-style: italic;
@@ -534,46 +641,44 @@ body {
   padding: 2rem 0;
 }
 
-.graph-tabs {
+.sub-tabs {
   display: flex;
   gap: 0;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #e5e3da;
+  padding-inline: 1rem;
 }
 
-.graph-tab {
-  flex: 1;
-  padding: 0.5rem 0;
+.sub-tab {
+  padding: 0.5rem 1.25rem;
   border: none;
   background: transparent;
-  font-size: 0.85rem;
+  font-size: 12.5px;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-weight: 500;
-  color: #666;
+  font-weight: 400;
+  color: #a3a199;
   cursor: pointer;
   border-bottom: 2px solid transparent;
   transition: color 0.15s, border-color 0.15s;
 }
 
-.graph-tab:hover {
-  color: #333;
+.sub-tab:hover {
+  color: #6b6a63;
 }
 
-.graph-tab.active {
-  color: #2563eb;
-  border-bottom-color: #2563eb;
+.sub-tab.active {
+  color: #1a1a18;
+  font-weight: 500;
+  border-bottom-color: #6b6a63;
+}
+
+.sub-tab--label {
+  cursor: default;
 }
 
 .graph-panel-body {
-  position: relative;
   display: flex;
   justify-content: center;
   padding: 1.5rem 0 1rem;
-}
-
-.graph-panel-body .export-button {
-  position: absolute;
-  top: 1.5rem;
-  right: 0;
 }
 
 .graph-svg-container {

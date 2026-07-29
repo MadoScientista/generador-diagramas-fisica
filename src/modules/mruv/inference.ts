@@ -9,7 +9,7 @@ export function inferMRUV(result: MRUVResult & { controls?: DiagramControls; cha
     vf: { showLabel: true, showValue: true, showVector: true },
     a: { showLabel: true, showValue: true, showVector: true },
     t: { showLabel: true, showValue: true },
-    dx: { showLabel: true, showValue: true, showVector: true },
+    dx: { showLabel: false, showValue: false, showVector: false },
   };
 
   let direction: 'left' | 'right' | 'none';

@@ -15,6 +15,7 @@ interface DiagramDataCardMRUVProps {
   onAUnitChange: (unit: AccelerationUnit) => void;
   onTimeUnitChange: (unit: TimeUnit) => void;
   onClear: () => void;
+  showTitle?: boolean;
 }
 
 export function DiagramDataCardMRUV({
@@ -30,10 +31,10 @@ export function DiagramDataCardMRUV({
   onAUnitChange,
   onTimeUnitChange,
   onClear,
+  showTitle = true,
 }: DiagramDataCardMRUVProps) {
-  return (
-    <div className="card">
-      <h3>Datos del diagrama</h3>
+  const inputs = (
+    <>
       <InputWithUnit
         id="xi"
         label="Posicion inicial"
@@ -101,6 +102,15 @@ export function DiagramDataCardMRUV({
       <button type="button" className="clear-button" onClick={onClear}>
         Borrar datos
       </button>
+    </>
+  );
+
+  if (!showTitle) return inputs;
+
+  return (
+    <div className="card">
+      <h3>Datos del diagrama</h3>
+      {inputs}
     </div>
   );
 }

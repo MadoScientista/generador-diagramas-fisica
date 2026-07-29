@@ -37,6 +37,7 @@ Note: engines are **not** unified yet. They duplicate the pipeline logic with di
 
 ## Conventions
 
+- Do not modify anything unless the user explicitly indicates otherwise.
 - **Language:** UI text, error messages, and comments are in Spanish.
 - **Imports use `.ts`/`.tsx` extensions** everywhere (enforced by `verbatimModuleSyntax`).
 - **React Compiler** is enabled via `babel-plugin-react-compiler` in `vite.config.ts`. This affects build performance and means hooks follow the Compiler's rules (no manual memoization needed in most cases).

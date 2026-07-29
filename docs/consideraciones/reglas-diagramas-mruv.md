@@ -1,6 +1,6 @@
 # Reglas de UI — Generador MRUV
 
-> Las reglas de dominio físico (ecuaciones, validación, resolución, unidades, categorías de error) están en `.opencode/skills/physics/mruv/SKILL.md`.
+> Las reglas de dominio físico (ecuaciones, validación, resolución, unidades, categorías de error) están en `.opencode/skills/physics/mruv-physics-domain/SKILL.md`.
 
 ---
 
@@ -23,7 +23,7 @@ Todo diagrama MRUV contiene:
 
 ## 2. Control de visualización de elementos
 
-> El patrón general de la tabla 5 columnas (Etiqueta / Valor / Vector / Móvil) está en AGENTS.md > UI Conventions.
+> El patrón general de la tabla 4 columnas (Etiqueta / Valor / Vector / Móvil) está en AGENTS.md > UI Conventions.
 
 Toggles en la tabla dentro del card **"Elementos del diagrama"**:
 
@@ -214,19 +214,31 @@ La página del generador MRUV sigue la misma estructura de MRU v2:
 
 **Sección izquierda (formulario):** cards con formulario usando CSS Grid (`grid-template-columns: 320px 1fr`).
 
-- **Card 1 - "Datos del diagrama"** (`DiagramDataCard`): 4 campos de entrada visibles usando el componente reutilizable `InputWithUnit` ($x_i$, $v_i$, $a$, $t$). Los campos $x_f$ y $v_f$ están ocultos pero la lógica subyacente se mantiene para posible re-habilitación futura. Un botón **"Calcular"** se habilita cuando los 4 campos están llenos.
-- **Card 2 - "Elementos del diagrama"** (`DiagramControlsCard`): tabla de controles con 7 filas ($x_i$, $x_f$, $v_i$, $v_f$, $a$, $t$, $\Delta x$). Columnas: *Etiqueta*, *Valor*, *Vector*, *Móvil*. Los checkboxes de $v_f$ se deshabilitan cuando el móvil $x_f$ está desactivado.
-- **Card 3 - "Apariencia diagrama"** (`DiagramAppearanceCard`): selectores de personaje (cuadrado, persona, bicicleta, automóvil) y fondo (blanco, parque, ciudad, playa). Usando `CollapsibleCard`.
+- **Card 1 - "Datos del diagrama"** (`DiagramDataCardMRUV`): envuelta en `CollapsibleCard` con `defaultOpen={true}`. Contiene 4 campos de entrada visibles usando el componente reutilizable `InputWithUnit` ($x_i$, $v_i$, $a$, $t$). Los campos $x_f$ y $v_f$ están ocultos pero la lógica subyacente se mantiene para posible re-habilitación futura. No hay botón "Calcular" — el motor resuelve automáticamente al contar con datos en los 4 campos. Incluye botón "Borrar datos" al final.
+- **Card 2 - "Elementos del diagrama"** (`DiagramControlsCardMRUV`): envuelta en `CollapsibleCard` con `defaultOpen={false}`. Tabla de controles con 7 filas ($x_i$, $x_f$, $v_i$, $v_f$, $a$, $t$, $\Delta x$). Columnas: *Etiqueta*, *Valor*, *Vector*, *Móvil*. Los checkboxes de $v_f$ se deshabilitan cuando el móvil $x_f$ está desactivado.
+- **Card 3 - "Apariencia diagrama"** (`DiagramAppearanceCard`): envuelta en `CollapsibleCard` con `defaultOpen={false}`. Selectores de personaje (cuadrado, persona, bicicleta, automóvil) y fondo (blanco, parque, ciudad, playa).
 
-Debajo de los cards, botones **"Generar Diagrama"** y **"Borrar datos"**.
+No hay botón "Generar Diagrama" global — el motor se ejecuta automáticamente cuando los datos son suficientes.
 
-**Sección derecha (diagrama):** componente `DiagramContainer` que muestra header (título "Vista previa" + botón **"Exportar"**) y el SVG generado. Estados vacío/error con `height: 250px`.
+**Sección derecha (diagrama):** componente `DiagramSection` que contiene:
+
+- **Header fijo (`.card-header`)**: pill de navegación (Diagrama / Gráficos) alineado a la izquierda + botón "Exportar" alineado a la derecha. El botón Exportar usa estilo secundario (`background: transparent`, `border: 1px solid #d4d4d4`, `color: #333`) para no competir con el azul de la navegación principal.
+- **Cuerpo (`.card-body`)**: contenido variable según la pestaña activa:
+  - **Diagrama**: barra de sub-tabs con etiqueta "Vista previa" (no interactiva, `cursor: default`), seguida del SVG renderizado dentro de `.diagram-section-svg` (altura mínima 440px). Estados vacío/error con placeholder centrado.
+  - **Gráficos**: barra de sub-tabs interactivos (Posición / Velocidad / Aceleración) alineados a la izquierda con línea horizontal completa bajo ellos. Cada tab usa `role="tab"` con navegación por teclado (ArrowLeft/ArrowRight). El SVG del gráfico se renderiza debajo en `.graph-panel-body` / `.graph-svg-container`.
+- **Pill (`.view-switcher-inner`)**: fondo `#f4f3ef`, borde `#e5e3da`, border-radius 999px, padding 3px. Tab activo: fondo blanco + sombra, texto `#1a1a18`. Tab inactivo: texto `#6b6a63`.
+- **Sub-tabs**: `border-bottom: 1px solid #e5e3da` a lo ancho de la tarjeta. Tabs con `padding: 0.5rem 1.25rem`, texto `#a3a199` (inactivo) / `#1a1a18` con `border-bottom: 2px solid #6b6a63` (activo).
+- **Estados vacío/error**: placeholder con `height: 474px`, texto en itálica, color `#888`.
 
 ### 9.2 Estilos
 
 > Estilo de cards, layout de página, fuente, estados vacío/error y flujo de UI están en AGENTS.md > UI Conventions.
 
-Las mismas tarjetas desplegables (`CollapsibleCard`) que MRU v2 para "Elementos del diagrama" y "Apariencia diagrama".
+| Tarjeta | `defaultOpen` | Componente interno |
+|---------|---------------|-------------------|
+| "Datos del diagrama" | `true` (abierto) | `DiagramDataCardMRUV` con `showTitle={false}` |
+| "Elementos del diagrama" | `false` (cerrado) | `DiagramControlsCardMRUV` con `showTitle={false}` |
+| "Apariencia diagrama" | `false` (cerrado) | `DiagramAppearanceCard` |
 
 ---
 
@@ -234,7 +246,7 @@ Las mismas tarjetas desplegables (`CollapsibleCard`) que MRU v2 para "Elementos 
 
 La variable calculada se auto-rellena y se marca como **computada**. Si el usuario edita el campo auto-computado, pasa a ser considerado **ingresado manualmente**.
 
-Al cambiar una unidad mientras los campos están llenos, se limpia el campo correspondiente y el motor lo re-computa en la nueva unidad.
+Al cambiar una unidad mientras los campos están llenos, se limpia el campo correspondiente y el motor lo re-computa en la nueva unidad. Para forzar una re-evaluación manual, el usuario puede presionar **Enter** en cualquier campo o borrar y re-ingresar un valor.
 
 ### 10.1 Campos ocultos
 
