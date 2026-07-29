@@ -10,7 +10,9 @@ function niceStep(range: number, targetTicks: number): number {
   const rough = range / (targetTicks - 1);
   const mag = Math.pow(10, Math.floor(Math.log10(rough)));
   const norm = rough / mag;
-  if (norm <= 2.5) return 5 * mag;
+  if (norm <= 1.5) return 1 * mag;
+  if (norm <= 2.5) return 2 * mag;
+  if (norm <= 3.5) return 2.5 * mag;
   if (norm <= 7.5) return 5 * mag;
   return 10 * mag;
 }
