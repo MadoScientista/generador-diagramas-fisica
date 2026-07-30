@@ -177,9 +177,48 @@ body {
   color: #333;
 }
 
+.input-with-unit .input-wrap:focus-within {
+  z-index: 1;
+}
+
+.input-with-unit input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+/* ── Input Wrap (rich placeholder) ───────────────────── */
+
 .input-with-unit {
   display: grid;
   grid-template-columns: 1fr auto;
+}
+
+.input-wrap {
+  position: relative;
+  min-width: 0;
+}
+
+.input-wrap input {
+  width: 100%;
+}
+
+.input-rich-placeholder {
+  position: absolute;
+  inset: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  color: #757575;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.input-rich-placeholder sub {
+  font-size: 0.7em;
+  vertical-align: sub;
 }
 
 .input-with-unit input {
@@ -193,39 +232,82 @@ body {
   min-width: 0;
 }
 
-.input-with-unit input:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-  z-index: 1;
+/* ── Unit Select ─────────────────────────────────────── */
+
+.unit-select {
   position: relative;
 }
 
-.input-with-unit select {
+.unit-select-trigger {
   padding: 0.5rem 0.5rem;
   border: 1px solid #ccc;
   border-left: 1px solid #ccc;
   border-radius: 0 4px 4px 0;
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-family: 'Inter', 'Roboto', sans-serif;
   background: #f5f5f5;
   color: #333;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 6px center;
-  padding-right: 20px;
   min-width: 70px;
   width: 70px;
+  text-align: center;
+  transition: background 0.15s;
 }
 
-.input-with-unit select:disabled {
+.unit-select-trigger:not(:disabled):hover {
+  background: #eaeaea;
+}
+
+.unit-select-trigger:disabled {
   background: #e9e9e9;
   color: #666;
   cursor: default;
+}
+
+.unit-select-trigger sup {
+  font-size: 0.7em;
+  vertical-align: super;
+  line-height: 0;
+}
+
+.unit-select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  min-width: 100%;
+  width: max-content;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  list-style: none;
+  padding: 0;
+  margin: 2px 0 0;
+}
+
+.unit-select-option {
+  padding: 0.4rem 0.75rem;
+  font-size: 1rem;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  color: #333;
+  cursor: pointer;
+  text-align: center;
+}
+
+.unit-select-option sup {
+  font-size: 0.7em;
+  vertical-align: super;
+  line-height: 0;
+}
+
+.unit-select-option:hover {
+  background: #f0f0f0;
+}
+
+.unit-select-option.selected {
+  background: #e8f0fe;
+  font-weight: 500;
 }
 
 /* ── Buttons ─────────────────────────────────────────── */
@@ -402,7 +484,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1.5rem 1rem;
+  padding: 1rem 1rem 0.5rem;
 }
 
 .card-header .export-button {
@@ -588,10 +670,20 @@ body {
 }
 
 .collapsible-card-body {
-  padding: 0.75rem 1.5rem 1.5rem;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.3s ease;
+}
+
+.collapsible-card-body.open {
+  max-height: 1000px;
+  opacity: 1;
+  padding: 0.75rem 1.5rem 1.5rem;
 }
 
 /* ── Appearance Card ─────────────────────────────────── */

@@ -1,4 +1,5 @@
-import { displayUnit } from '../../../core/units.ts';
+import { identToHTML } from '../../../core/format.ts';
+import { UnitSelect } from './UnitSelect.tsx';
 
 interface InputWithUnitProps {
   id: string;
@@ -23,27 +24,32 @@ export function InputWithUnit({
   onUnitChange,
   disabled,
 }: InputWithUnitProps) {
+  const richPlaceholder = identToHTML(placeholder);
+
   return (
     <div className="form-field">
       <label htmlFor={id}>{label}</label>
       <div className="input-with-unit">
-        <input
-          id={id}
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          disabled={disabled}
-          autoComplete="off"
-        />
-        <select
+        <div className="input-wrap">
+          <input
+            id={id}
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={richPlaceholder ? '' : placeholder}
+            disabled={disabled}
+            autoComplete="off"
+          />
+          {richPlaceholder && !value && (
+            <span className="input-rich-placeholder" aria-hidden="true" dangerouslySetInnerHTML={{ __html: richPlaceholder }} />
+          )}
+        </div>
+        <UnitSelect
           value={unit}
-          onChange={(e) => onUnitChange(e.target.value)}
-        >
-          {units.map((u) => (
-            <option key={u} value={u}>{displayUnit(u)}</option>
-          ))}
-        </select>
+          units={units}
+          onChange={onUnitChange}
+          disabled={disabled}
+        />
       </div>
     </div>
   );

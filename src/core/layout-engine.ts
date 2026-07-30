@@ -7,6 +7,7 @@ import type {
   Layer,
   CharacterType,
   VectorNode,
+  PositionNode,
 } from './types.ts';
 import { getSpriteConfig } from './sprite-registry.ts';
 
@@ -18,7 +19,6 @@ const AXIS_Y = VIEWPORT_HEIGHT / 2 + 40;
 const TICK_SIZE = 8;
 const VECTOR_LENGTH = 80;
 const POSITION_PADDING = 40;
-const MIN_TICK_GAP = 50;
 const AXIS_LINE_WIDTH = 760;
 const LABEL_OFFSET_Y = 22;
 const LABEL_GAP = 10;
@@ -44,7 +44,24 @@ function getLayer(node: SceneGraphNode): Layer {
   }
 }
 
-function buildPhysScreenMap(nodes: SceneGraphNode[], margin: number, usableWidth: number): Map<number, number> {
+function computeMinGap(nodes: SceneGraphNode[]): number {
+  const halfChar = getSpriteConfig('square').width / 2;
+  const baseGap = halfChar + VECTOR_LENGTH + halfChar;
+
+  let maxLabelGap = 0;
+  for (const n of nodes) {
+    if (n.type === 'label' && (n.semanticRole === 'label-vi' || n.semanticRole === 'label-vf')) {
+      const estHalfWidth = n.text.length * 4;
+      const offset = Math.max(halfChar + VECTOR_LENGTH / 2, halfChar + 10 + estHalfWidth);
+      const labelGap = offset + estHalfWidth + halfChar;
+      if (labelGap > maxLabelGap) maxLabelGap = labelGap;
+    }
+  }
+
+  return Math.max(baseGap, maxLabelGap);
+}
+
+function buildPhysScreenMap(nodes: SceneGraphNode[], margin: number, usableWidth: number, minGap: number): Map<number, number> {
   const padMargin = margin + POSITION_PADDING;
   const padWidth = usableWidth - 2 * POSITION_PADDING;
 
@@ -64,16 +81,16 @@ function buildPhysScreenMap(nodes: SceneGraphNode[], margin: number, usableWidth
   const linear = phys.map(v => padMargin + ((v - physMin) / physRange) * totalPx);
   let ok = true;
   for (let i = 1; i < phys.length; i++) {
-    if (linear[i] - linear[i - 1] < MIN_TICK_GAP) { ok = false; break; }
+    if (linear[i] - linear[i - 1] < minGap) { ok = false; break; }
   }
   if (ok) return new Map(phys.map((v, i) => [v, linear[i]]));
 
-  const minTotal = (phys.length - 1) * MIN_TICK_GAP;
+  const minTotal = (phys.length - 1) * minGap;
   const availProp = Math.max(0, totalPx - minTotal);
   const out: number[] = [padMargin];
   for (let i = 1; i < phys.length; i++) {
     const frac = physRange === 0 ? 0 : (phys[i] - phys[i - 1]) / physRange;
-    out.push(out[i - 1] + MIN_TICK_GAP + frac * availProp);
+    out.push(out[i - 1] + minGap + frac * availProp);
   }
   return new Map(phys.map((v, i) => [v, out[i]]));
 }
@@ -129,7 +146,8 @@ function getCharDimensions(nodes: SceneGraphNode[]): { w: number; h: number } {
 
 export function layout(sceneGraph: SceneGraph): LayoutScene {
   const nodes = flatten(sceneGraph);
-  const posMap = buildPhysScreenMap(nodes, MARGIN, USABLE_WIDTH);
+  const minGap = computeMinGap(nodes);
+  const posMap = buildPhysScreenMap(nodes, MARGIN, USABLE_WIDTH, minGap);
   const positioned: PositionedNode[] = [];
   const { w: charW, h: charH } = getCharDimensions(nodes);
 
@@ -238,14 +256,25 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
           const originSx = posMap.get(0)!;
           const xfSx = getFinalScreenX(nodes, posMap);
           const xfDist = Math.abs(xfSx - originSx);
-          if (xfDist < 50) {
+
+          const xiNode = nodes.find(
+            (n): n is PositionNode => n.type === 'position' && n.semanticRole === 'initial'
+          );
+          const xfNode = nodes.find(
+            (n): n is PositionNode => n.type === 'position' && n.semanticRole === 'final'
+          );
+          const samePos = xiNode && xfNode && xiNode.physicalValue === xfNode.physicalValue;
+
+          if (samePos) {
+            labelY = xfDist < 50
+              ? AXIS_Y - charH - LABEL_GAP - 18
+              : AXIS_Y - charH - LABEL_GAP;
+          } else if (xfDist < 50) {
             const xiSx = getInitialScreenX(nodes, posMap);
             const xiDist = Math.abs(xiSx - originSx);
-            if (xiDist < 50) {
-              labelY = AXIS_Y - charH - LABEL_GAP - 18;
-            } else {
-              labelY = AXIS_Y - charH - LABEL_GAP;
-            }
+            labelY = xiDist < 50
+              ? AXIS_Y - charH - LABEL_GAP - 18
+              : AXIS_Y - charH - LABEL_GAP;
           } else {
             labelY = AXIS_Y + TICK_SIZE + LABEL_OFFSET_Y;
           }

@@ -33,7 +33,7 @@ Toggles en la tabla dentro del card **"Elementos del diagrama"**:
 | $x_f$ | `xf` / `xf = 50 m` | Activo/Inactivo | — | **Activo/Inactivo** |
 | $v_i$ | `vi` / `vi = 0 m/s` | Activo/Inactivo | Activo/Inactivo | — |
 | $v_f$ | `vf` / `vf = 10 m/s` | Activo/Inactivo | Activo/Inactivo | — |
-| $a$ | `a` / `a = 2 m/s²` | Activo/Inactivo | Activo/Inactivo | — |
+| $a$ | `a` / `a = 2 m/s^2` | Activo/Inactivo | Activo/Inactivo | — |
 | $t$ | `t` / `5 s` | Activo/Inactivo | — | — |
 | $\Delta x$ | `Δx` / `Δx = 50 m` | Activo/Inactivo | Activo/Inactivo | — |
 
@@ -214,15 +214,21 @@ La página del generador MRUV sigue la misma estructura de MRU v2:
 
 **Sección izquierda (formulario):** cards con formulario usando CSS Grid (`grid-template-columns: 320px 1fr`).
 
-- **Card 1 - "Datos del diagrama"** (`DiagramDataCardMRUV`): envuelta en `CollapsibleCard` con `defaultOpen={true}`. Contiene 4 campos de entrada visibles usando el componente reutilizable `InputWithUnit` ($x_i$, $v_i$, $a$, $t$). Los campos $x_f$ y $v_f$ están ocultos pero la lógica subyacente se mantiene para posible re-habilitación futura. No hay botón "Calcular" — el motor resuelve automáticamente al contar con datos en los 4 campos. Incluye botón "Borrar datos" al final.
-- **Card 2 - "Elementos del diagrama"** (`DiagramControlsCardMRUV`): envuelta en `CollapsibleCard` con `defaultOpen={false}`. Tabla de controles con 7 filas ($x_i$, $x_f$, $v_i$, $v_f$, $a$, $t$, $\Delta x$). Columnas: *Etiqueta*, *Valor*, *Vector*, *Móvil*. Los checkboxes de $v_f$ se deshabilitan cuando el móvil $x_f$ está desactivado.
-- **Card 3 - "Apariencia diagrama"** (`DiagramAppearanceCard`): envuelta en `CollapsibleCard` con `defaultOpen={false}`. Selectores de personaje (cuadrado, persona, bicicleta, automóvil) y fondo (blanco, parque, ciudad, playa).
+Las tres tarjetas usan un patrón de **acordeón controlado**: solo una puede estar abierta a la vez. El estado se maneja con `useState<'datos' | 'elementos' | 'apariencia' | null>('datos')` en el padre. Cada `CollapsibleCard` recibe `open` y `onToggle` como props controladas; al hacer clic en el encabezado se cierra si ya estaba abierta, o se abre y cierra la anterior.
+
+- **Card 1 - "Datos del diagrama"** (`DiagramDataCardMRUV`): envuelta en `CollapsibleCard` controlada con `open={openCard === 'datos'}`. Contiene 4 campos de entrada visibles usando el componente reutilizable `InputWithUnit` ($x_i$, $v_i$, $a$, $t$). Los campos $x_f$ y $v_f$ están ocultos pero la lógica subyacente se mantiene para posible re-habilitación futura. No hay botón "Calcular" — el motor resuelve automáticamente al contar con datos en los 4 campos. Incluye botón "Borrar datos" al final.
+  - `InputWithUnit` usa `UnitSelect` (dropdown personalizado) para la selección de unidades, en vez de un `<select>` nativo.
+  - Los placeholders de los campos muestran subíndices con HTML `<sub>` mediante `identToHTML`: `xi` → `x<sub>i</sub>`, `xf` → `x<sub>f</sub>`, `vi` → `v<sub>i</sub>`, `vf` → `v<sub>f</sub>`.
+  - Las unidades en el dropdown se renderizan con HTML `<sup>` mediante `displayUnitHTML`: `m/s^2` → `m/s<sup>2</sup>`.
+  - El dropdown y el input comparten `font-size: 1rem`, `line-height: normal` y `padding` idéntico para igualar alturas.
+- **Card 2 - "Elementos del diagrama"** (`DiagramControlsCardMRUV`): envuelta en `CollapsibleCard` controlada con `open={openCard === 'elementos'}`. Tabla de controles con 7 filas ($x_i$, $x_f$, $v_i$, $v_f$, $a$, $t$, $\Delta x$). Columnas: *Etiqueta*, *Valor*, *Vector*, *Móvil*. Los checkboxes de $v_f$ se deshabilitan cuando el móvil $x_f$ está desactivado.
+- **Card 3 - "Apariencia diagrama"** (`DiagramAppearanceCard`): envuelta en `CollapsibleCard` controlada con `open={openCard === 'apariencia'}`. Selectores de personaje (cuadrado, persona, bicicleta, automóvil) y fondo (blanco, parque, ciudad, playa).
 
 No hay botón "Generar Diagrama" global — el motor se ejecuta automáticamente cuando los datos son suficientes.
 
 **Sección derecha (diagrama):** componente `DiagramSection` que contiene:
 
-- **Header fijo (`.card-header`)**: pill de navegación (Diagrama / Gráficos) alineado a la izquierda + botón "Exportar" alineado a la derecha. El botón Exportar usa estilo secundario (`background: transparent`, `border: 1px solid #d4d4d4`, `color: #333`) para no competir con el azul de la navegación principal.
+- **Header fijo (`.card-header`)**: padding `1rem 1rem 0.5rem`, display flex con gap `0.75rem`. Pill de navegación (Diagrama / Gráficos) alineado a la izquierda + botón "Exportar" alineado a la derecha. El botón Exportar usa estilo secundario (`background: transparent`, `border: 1px solid #d4d4d4`, `color: #333`) para no competir con el azul de la navegación principal.
 - **Cuerpo (`.card-body`)**: contenido variable según la pestaña activa:
   - **Diagrama**: barra de sub-tabs con etiqueta "Vista previa" (no interactiva, `cursor: default`), seguida del SVG renderizado dentro de `.diagram-section-svg` (altura mínima 440px). Estados vacío/error con placeholder centrado.
   - **Gráficos**: barra de sub-tabs interactivos (Posición / Velocidad / Aceleración) alineados a la izquierda con línea horizontal completa bajo ellos. Cada tab usa `role="tab"` con navegación por teclado (ArrowLeft/ArrowRight). El SVG del gráfico se renderiza debajo en `.graph-panel-body` / `.graph-svg-container`.
@@ -234,15 +240,57 @@ No hay botón "Generar Diagrama" global — el motor se ejecuta automáticamente
 
 > Estilo de cards, layout de página, fuente, estados vacío/error y flujo de UI están en AGENTS.md > UI Conventions.
 
-| Tarjeta | `defaultOpen` | Componente interno |
+| Tarjeta | Estado inicial | Componente interno |
 |---------|---------------|-------------------|
-| "Datos del diagrama" | `true` (abierto) | `DiagramDataCardMRUV` con `showTitle={false}` |
-| "Elementos del diagrama" | `false` (cerrado) | `DiagramControlsCardMRUV` con `showTitle={false}` |
-| "Apariencia diagrama" | `false` (cerrado) | `DiagramAppearanceCard` |
+| "Datos del diagrama" | Abierta (valor inicial de `openCard`: `'datos'`) | `DiagramDataCardMRUV` con `showTitle={false}` |
+| "Elementos del diagrama" | Cerrada | `DiagramControlsCardMRUV` con `showTitle={false}` |
+| "Apariencia diagrama" | Cerrada | `DiagramAppearanceCard` |
+
+### 9.3 Comportamiento de acordeón
+
+Las tres tarjetas colapsables funcionan como un grupo de acordeón:
+
+- Solo una tarjeta puede estar abierta simultáneamente
+- Al hacer clic en el encabezado de una tarjeta cerrada, se abre y la que estuviera abierta se cierra
+- Al hacer clic en el encabezado de la tarjeta actualmente abierta, se cierra (todas colapsan)
+- El estado se maneja con `useState<'datos' | 'elementos' | 'apariencia' | null>('datos')`
+- El callback `handleToggleCard(card)` decide: si la tarjeta clickeada es la misma que la abierta, devuelve `null`; si es otra, devuelve esa
+
+### 9.4 Animación de despliegue
+
+El colapso y expansión de las tarjetas usa transiciones CSS para una animación suave:
+
+- El cuerpo de la tarjeta usa `max-height` con transición (0.35s): `0` cuando está cerrado, `1000px` cuando está abierto
+- La opacidad transiciona en 0.25s
+- El padding vertical transiciona en 0.3s (de `0` a `0.75rem 1.5rem 1.5rem`)
+- El chevron del encabezado rota 180° con transición de 0.2s
+
+> **Nota:** El límite de `max-height: 1000px` es un valor suficientemente grande para el contenido actual. Si una tarjeta llegara a tener contenido más alto, el contenido se recortaría por el `overflow: hidden`.
 
 ---
 
-## 10. Notas de implementación
+## 10. Estrategia de renderizado de subíndices y superíndices
+
+Todos los subíndices y superíndices se renderizan usando una **estrategia unificada basada en segmentos de texto**, adaptada al contexto de salida:
+
+| Contexto | Estrategia | Archivo clave |
+|----------|-----------|---------------|
+| Labels del diagrama (SVG) | `TextSegment[]` → `<tspan>` con `dy` (offset vertical) y `fontSize` reducido. Subíndice: `dy=4`, `fontSize=10`. Superíndice: `dy=-4`, `fontSize=10`. | `renderer.ts:renderSegments`, `format.ts:parseIdentifier`, `format.ts:parseUnit` |
+| Ejes de gráficos (SVG) | Misma estrategia de `<tspan>` que los labels del diagrama. `renderGraph` recibe `yLabelDesc` y `yUnit` por separado; la unidad se pasa por `parseUnit` y se renderiza con `renderSegments`. | `shared.ts`, `format.ts:parseUnit` |
+| Placeholders de inputs (HTML) | `identToHTML` convierte identificadores (`xi`, `xf`, `vi`, `vf`) a HTML con `<sub>`. Se renderiza como overlay posicionado sobre el input con `pointer-events: none`. | `format.ts:identToHTML`, `InputWithUnit.tsx` |
+| Dropdown de unidades (HTML) | `displayUnitHTML` convierte `^2` → `<sup>2</sup>`. El `UnitSelect` usa `<button>` con `dangerouslySetInnerHTML`. `<sup>` usa `vertical-align: super` + `line-height: 0` para evitar expandir la caja del botón. | `units.ts:displayUnitHTML`, `UnitSelect.tsx` |
+
+Los `<sub>` y `<sup>` deben usarse siempre en **contexto inline** (no dentro de `display: flex`), porque `vertical-align` no se aplica a flex items.
+
+### 10.1 Representación interna vs visual
+
+Internamente, las unidades se almacenan con notación `^` (ej. `m/s^2`, `km/h^2`). La conversión a visual ocurre en la capa de presentación:
+
+- SVG: `parseUnit` → `<tspan dy="-4" font-size="10">2</tspan>`
+- HTML: `displayUnitHTML` → `<sup>2</sup>`
+- Texto plano: `displayUnit` → Unicode `²` (solo para contextos que no admiten HTML, como opciones nativas)
+
+## 11. Notas de implementación
 
 La variable calculada se auto-rellena y se marca como **computada**. Si el usuario edita el campo auto-computado, pasa a ser considerado **ingresado manualmente**.
 

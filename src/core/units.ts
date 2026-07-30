@@ -17,6 +17,10 @@ export function displayUnit(unit: string): string {
   return unit.replace('^2', '\u00B2');
 }
 
+export function displayUnitHTML(unit: string): string {
+  return unit.replace(/\^(\d+)/g, '<sup>$1</sup>');
+}
+
 export function toSI(
   value: number,
   unit: DistanceUnit | TimeUnit | VelocityUnit | AccelerationUnit,

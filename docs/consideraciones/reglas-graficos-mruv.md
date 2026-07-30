@@ -52,11 +52,10 @@ conveniencia visual.
 
 Actualmente **no se marca ningún punto de interés** en los gráficos.
 
-- El cálculo de `τ*` (cambio de sentido de la velocidad: `τ* = -vi / a`) se realiza en
-  `computeGraphData`, pero el resultado siempre se fuerza a `null`, de modo que no se
-  renderiza ningún marcador en los tres gráficos.
-- Esta decisión es reversible: si en el futuro se desea marcar `τ*`, basta con devolver el
-  valor calculado en vez de `null` en `graph-helpers.ts`.
+- `computeGraphData` devuelve `tauStar: null` sin calcular el valor de `τ*` (cambio de
+  sentido de la velocidad: `τ* = -vi / a`). No se realiza el cálculo porque no se usa.
+- Esta decisión es reversible: si en el futuro se desea marcar `τ*`, basta con calcular
+  `-vi / a` y devolverlo en vez de `null` en `graph-helpers.ts`.
 
 *(Puntos de interés adicionales — como extremos `(0, xi)`/`(t, xf)`, o cruces de a=0 en
 movimiento por tramos — no están definidos en esta versión del documento y no deben agregarse
@@ -70,32 +69,56 @@ sin actualizarlo explícitamente.)*
 
 ## 7. Estructura de presentación
 
-- Los tres gráficos (x-t, v-t, a-t) conviven dentro de **una sola tarjeta desplegable**
-  (`CollapsibleCard` con título "Gráficos") usando un sistema de **pestañas** (tabs).
-- Las pestañas muestran etiquetas cortas: "Posición", "Velocidad", "Aceleración".
-- Solo un gráfico es visible a la vez; el activo por defecto es la primera pestaña
-  ("Posición").
-- Estado por defecto: **colapsada** (igual que otros `CollapsibleCards` del proyecto).
+Los gráficos están integrados dentro del componente `DiagramSection`, que contiene un
+**selector tipo pill** (switcher) con dos vistas: **Diagrama** y **Gráficos**.
 
-### Estado sin datos
+- El pill es un `role="tablist"` con dos botones `role="tab"`, navegables con
+  ArrowLeft/ArrowRight.
+- La vista activa predeterminada es **Diagrama**.
+- No hay una `CollapsibleCard` separada para gráficos — el contenido del panel derecho
+  conmuta entre el SVG del diagrama y el sistema de pestañas de gráficos.
 
-- La tarjeta "Gráficos" **siempre es visible** en la página (no se condiciona su renderizado).
-- Cuando no hay datos resueltos (`disabled=true`), el body de la tarjeta muestra la leyenda
-  "Ingrese datos del diagrama" en gris claro / italic.
-- Cuando los datos están disponibles, se muestran las pestañas con los gráficos y la tarjeta
-  se puede desplegar normalmente.
+### Vista Gráficos
+
+- Debajo del pill hay una barra de **sub-tabs** con `role="tablist"`: "Posición",
+  "Velocidad", "Aceleración". También navegables con ArrowLeft/ArrowRight.
+- Solo un gráfico es visible a la vez; el activo por defecto es el primero ("Posición").
+- El SVG del gráfico activo se renderiza en `.graph-panel-body` > `.graph-svg-container`.
+- Cada sub-tab activo usa `border-bottom: 2px solid #6b6a63`; los inactivos tienen texto
+  `#a3a199`.
+
+### Estado sin datos (vista Gráficos)
+
+- Cuando no hay datos resueltos (`graphsDisabled=true`), el body del panel de gráficos
+  muestra la leyenda "Ingrese datos del diagrama" en gris claro / italic.
+- Los sub-tabs se renderizan igualmente como etiquetas no interactivas
+  (`.sub-tab--label`, `cursor: default`) para mantener la estructura visual.
+- La vista Gráficos **siempre es accesible** desde el pill, incluso sin datos.
 
 ## 8. Títulos y etiquetas
 
 | Elemento | Texto |
-|---|---|
-| Tarjeta (CollapsibleCard) | `Gráficos` |
-| Pestaña x vs t | `Posición` |
-| Pestaña v vs t | `Velocidad` |
-| Pestaña a vs t | `Aceleración` |
+|---|---|---|
+| Pill de navegación (primera opción) | `Diagrama` |
+| Pill de navegación (segunda opción) | `Gráficos` |
+| Sub-tab x vs t | `Posición` |
+| Sub-tab v vs t | `Velocidad` |
+| Sub-tab a vs t | `Aceleración` |
 | Placeholder (sin datos) | `Ingrese datos del diagrama` |
 
 Las unidades se muestran en los ejes del gráfico, no en los títulos ni etiquetas de pestaña.
+
+### 8.1 Renderizado de superíndices en ejes
+
+El label del eje Y se construye pasando descripción y unidad por separado a `renderGraph` (`yLabelDesc`, `yUnit`). La unidad se procesa con `parseUnit` y se renderiza con `renderSegments`, generando `<tspan>` SVG para superíndices:
+
+| Entrada | Output SVG |
+|---------|-----------|
+| `yLabelDesc='Aceleración'`, `yUnit='m/s^2'` | `<text ...>Aceleración (<tspan>m/s</tspan><tspan dy="-4" font-size="10">2</tspan>)</text>` |
+| `yLabelDesc='Velocidad'`, `yUnit='m/s'` | `<text ...>Velocidad (<tspan>m/s</tspan>)</text>` |
+| `yLabelDesc='Posición'`, `yUnit='m'` | `<text ...>Posición (<tspan>m</tspan>)</text>` |
+
+Esta estrategia es la misma que usan los labels del diagrama principal (`TextSegment[]` → `<tspan>`).
 
 ## 9. Fuera de alcance de este documento
 
@@ -117,12 +140,16 @@ de inferir una solución de diseño no especificada aquí.
 | Renderizado de curva | Línea continua (`<polyline>`), no puntos individuales |
 | Muestreo temporal | 100 puntos equiespaciados entre 0 y t |
 | τ* renderizado | Deshabilitado — `tauStar` siempre se devuelve como `null` |
-| Estado por defecto de tarjeta | Colapsada (igual que otros CollapsibleCards del proyecto) |
-| Ubicación en la página | Dentro de `.diagram-section`, debajo de `DiagramContainer` |
+| Vista predeterminada del pill | `Diagrama` (la vista Gráficos se activa al hacer clic en "Gráficos") |
+| Ubicación en la página | Integrada en `DiagramSection` como segunda pestaña del pill de navegación |
 | Visibilidad de sección | Siempre visible; cuando `disabled` muestra placeholder "Ingrese datos del diagrama" |
 | Estilo de curva | Stroke `#2563eb`, stroke-width `2`, sin fill |
 | Ejes | Con flechas, color `#000`, etiquetas en español |
-| Ticks de ejes | `computeNiceTicks()` — múltiplos de 5 exclusivamente; `0` se excluye del eje horizontal, siempre incluido en el eje vertical |
+| Font-size eje Y (título) | `14px` (etiqueta de eje Y se renderiza mediante `renderSegments` + `parseUnit` para superíndices) |
+| Font-size eje X (título) | `14px` (texto plano: "Tiempo (s)") |
+| Font-size ticks | `11px` (valores numéricos en ambos ejes) |
+| API `renderGraph` | `(points, getY, yLabelDesc: string, yUnit: string)` — descripción y unidad separadas |
+| Ticks de ejes | `computeNiceTicks()` — pasos "bonitos" (1, 2, 2.5, 5, 10 × 10^n); `0` se excluye del eje horizontal, siempre incluido en el eje vertical |
 | Tamaño SVG | Fijo 400×400 (viewBox, no responsive) |
-| Exportación | Cada gráfico con su propio botón "Exportar", posicionado absolute top-right del panel |
+| Exportación | Botón "Exportar" único en el header de `DiagramSection`. Exporta el SVG activo (diagrama o gráfico según la pestaña seleccionada en el pill) |
 | Caso a=0 | Mostrar igualmente (curvas lineales/constantes) |

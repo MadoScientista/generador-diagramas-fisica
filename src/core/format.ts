@@ -1,6 +1,6 @@
 import type { TextSegment } from './types.ts';
 
-function parseUnit(unit: string): TextSegment[] {
+export function parseUnit(unit: string): TextSegment[] {
   const idx = unit.indexOf('^');
   if (idx === -1) {
     return [{ text: unit, dy: 0, fontSize: 14 }];
@@ -62,6 +62,21 @@ function parseIdentifier(prefix: string): TextSegment[] {
 export interface LabelSegments {
   segments: TextSegment[];
   text: string;
+}
+
+export function identToHTML(ident: string): string | null {
+  switch (ident) {
+    case 'xi':
+      return 'x<sub>i</sub>';
+    case 'xf':
+      return 'x<sub>f</sub>';
+    case 'vi':
+      return 'v<sub>i</sub>';
+    case 'vf':
+      return 'v<sub>f</sub>';
+    default:
+      return null;
+  }
 }
 
 export function buildLabelSegments(

@@ -1,5 +1,7 @@
+import type { TextSegment } from '../../../../core/types.ts';
 import { computeNiceTicks } from '../../../../modules/mruv/graph-helpers.ts';
-import { formatValue } from '../../../../core/format.ts';
+import { formatValue, parseUnit } from '../../../../core/format.ts';
+import { renderSegments } from '../../../../core/renderer.ts';
 
 const WIDTH = 400;
 const HEIGHT = 400;
@@ -12,7 +14,8 @@ const AXIS_COLOR = '#000';
 export function renderGraph(
   points: { t: number; x: number; v: number; a: number }[],
   getY: (p: { t: number; x: number; v: number; a: number }) => number,
-  yLabel: string,
+  yLabelDesc: string,
+  yUnit: string,
 ): string {
   if (points.length === 0) return '';
 
@@ -39,16 +42,22 @@ export function renderGraph(
   const timeTicks = computeNiceTicks(0, tMax).map((t) => ({ t, x: toX(t) }));
   const yTicks = computeNiceTicks(yMinPadded, yMaxPadded).map((v) => ({ v, y: toY(v) }));
 
+  const yLabelSegments: TextSegment[] = [
+    { text: `${yLabelDesc} (`, dy: 0, fontSize: 14 },
+    ...parseUnit(yUnit),
+    { text: ')', dy: 0, fontSize: 14 },
+  ];
+
   return `<svg viewBox="0 0 ${WIDTH} ${HEIGHT}" width="${WIDTH}" height="${HEIGHT}" xmlns="http://www.w3.org/2000/svg">
-  <style>text { font-family: 'Inter', 'Roboto', sans-serif; }</style>
+  <style>text { font-family: 'Inter', 'Roboto', sans-serif'; font-size: 14px; }</style>
   <line x1="${MARGIN.left}" y1="${axisY0}" x2="${axisXEnd + 10}" y2="${axisY0}" stroke="${AXIS_COLOR}" stroke-width="1.5"/>
   <polygon points="${axisXEnd + 10},${axisY0} ${axisXEnd + 4},${axisY0 - 4} ${axisXEnd + 4},${axisY0 + 4}" fill="${AXIS_COLOR}"/>
   <line x1="${MARGIN.left}" y1="${PLOT_H + MARGIN.top}" x2="${MARGIN.left}" y2="${MARGIN.top - 10}" stroke="${AXIS_COLOR}" stroke-width="1.5"/>
   <polygon points="${MARGIN.left},${MARGIN.top - 10} ${MARGIN.left - 4},${MARGIN.top - 4} ${MARGIN.left + 4},${MARGIN.top - 4}" fill="${AXIS_COLOR}"/>
   ${timeTicks.filter((tick) => tick.t > 0).map((tick) => `<line x1="${tick.x}" y1="${axisY0 - 3}" x2="${tick.x}" y2="${axisY0 + 3}" stroke="${AXIS_COLOR}" stroke-width="1"/><text x="${tick.x}" y="${axisY0 + 16}" text-anchor="middle" font-size="11" fill="${AXIS_COLOR}">${formatValue(tick.t)}</text>`).join('\n  ')}
   ${yTicks.map((tick) => `<line x1="${MARGIN.left - 3}" y1="${tick.y}" x2="${MARGIN.left + 3}" y2="${tick.y}" stroke="${AXIS_COLOR}" stroke-width="1"/><text x="${MARGIN.left - 8}" y="${tick.y + 4}" text-anchor="end" font-size="11" fill="${AXIS_COLOR}">${formatValue(tick.v)}</text>`).join('\n  ')}
-  <text x="${WIDTH / 2}" y="${HEIGHT - 8}" text-anchor="middle" font-size="13" fill="#000">Tiempo (s)</text>
-  <text x="14" y="${HEIGHT / 2}" text-anchor="middle" font-size="13" fill="#000" transform="rotate(-90, 14, ${HEIGHT / 2})">${yLabel}</text>
+  <text x="${WIDTH / 2}" y="${HEIGHT - 8}" text-anchor="middle" fill="#000">Tiempo (s)</text>
+  <text x="14" y="${HEIGHT / 2}" text-anchor="middle" fill="#000" transform="rotate(-90, 14, ${HEIGHT / 2})">${renderSegments(yLabelSegments)}</text>
   <polyline points="${linePoints}" fill="none" stroke="${STROKE}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 }

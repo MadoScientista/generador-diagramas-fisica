@@ -98,7 +98,7 @@ function renderDisplacementArrow(node: PositionedNode): string {
     <polygon points="${endX},${y} ${endX + arrowSize},${y - arrowSize / 2} ${endX + arrowSize},${y + arrowSize / 2}" fill="black" />`;
 }
 
-function renderSegments(segments: import('./types.ts').TextSegment[]): string {
+export function renderSegments(segments: import('./types.ts').TextSegment[]): string {
   let currentDy = 0;
   return segments
     .map((seg) => {

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useDiagramControls } from '../hooks/useDiagramControls.ts';
 import { useMRUVDiagram } from '../hooks/useMRUVDiagram.ts';
 import { DiagramDataCardMRUV } from '../ui/components/form/DiagramDataCardMRUV.tsx';
@@ -28,6 +28,11 @@ export function MRUVGeneratorPage() {
 
   const [character, setCharacter] = useState<CharacterType>('square');
   const [background, setBackground] = useState<BackgroundType>('white');
+  const [openCard, setOpenCard] = useState<'datos' | 'elementos' | 'apariencia' | null>('datos');
+
+  const handleToggleCard = useCallback((card: 'datos' | 'elementos' | 'apariencia') => {
+    setOpenCard((prev) => (prev === card ? null : card));
+  }, []);
 
   const {
     values,
@@ -70,7 +75,7 @@ export function MRUVGeneratorPage() {
   return (
     <div className="generator-page">
       <section className="input-section">
-        <CollapsibleCard title="Datos del diagrama" defaultOpen={true}>
+        <CollapsibleCard title="Datos del diagrama" open={openCard === 'datos'} onToggle={() => handleToggleCard('datos')}>
           <DiagramDataCardMRUV
             values={values}
             computedValues={computedValues}
@@ -87,14 +92,14 @@ export function MRUVGeneratorPage() {
             showTitle={false}
           />
         </CollapsibleCard>
-        <CollapsibleCard title="Elementos del diagrama" defaultOpen={false}>
+        <CollapsibleCard title="Elementos del diagrama" open={openCard === 'elementos'} onToggle={() => handleToggleCard('elementos')}>
           <DiagramControlsCardMRUV
             controls={controls}
             onControlChange={handleControlChange}
             showTitle={false}
           />
         </CollapsibleCard>
-        <CollapsibleCard title="Apariencia diagrama" defaultOpen={false}>
+        <CollapsibleCard title="Apariencia diagrama" open={openCard === 'apariencia'} onToggle={() => handleToggleCard('apariencia')}>
           <DiagramAppearanceCard
             character={character}
             background={background}
