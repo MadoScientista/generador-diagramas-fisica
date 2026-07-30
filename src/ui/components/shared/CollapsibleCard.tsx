@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useRef, useLayoutEffect, useCallback, type ReactNode } from 'react';
 
 interface CollapsibleCardProps {
   title: string;
@@ -10,8 +10,28 @@ interface CollapsibleCardProps {
 
 export function CollapsibleCard({ title, defaultOpen = true, children, open, onToggle }: CollapsibleCardProps) {
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [maxHeight, setMaxHeight] = useState(() => (open ?? defaultOpen) ? 1000 : 0);
+  const prevOpenRef = useRef(open ?? internalOpen);
 
   const isOpen = open ?? internalOpen;
+
+  const measureHeight = useCallback(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    const h = el.scrollHeight;
+    if (h <= 0) return;
+    const fs = parseFloat(getComputedStyle(el).fontSize) || 16;
+    const openPad = (0.75 + 1.5) * fs;
+    setMaxHeight(h + openPad);
+  }, []);
+
+  useLayoutEffect(measureHeight, [children]);
+  useLayoutEffect(() => {
+    const prev = prevOpenRef.current;
+    prevOpenRef.current = isOpen;
+    if (isOpen && !prev) measureHeight();
+  }, [isOpen]);
 
   const handleToggle = () => {
     if (onToggle) {
@@ -31,7 +51,11 @@ export function CollapsibleCard({ title, defaultOpen = true, children, open, onT
         <span>{title}</span>
         <span className={`chevron${isOpen ? ' open' : ''}`}>&#9660;</span>
       </button>
-      <div className={`collapsible-card-body${isOpen ? ' open' : ''}`}>
+      <div
+        ref={bodyRef}
+        className={`collapsible-card-body${isOpen ? ' open' : ''}`}
+        style={{ maxHeight: isOpen ? maxHeight : 0 }}
+      >
         {children}
       </div>
     </div>

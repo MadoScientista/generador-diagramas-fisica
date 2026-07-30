@@ -118,7 +118,7 @@ Cuando hay menos de 4 campos numéricos llenos, se renderiza solo:
 
 ### 4.2 Vector Aceleración ($a$)
 
-- **Ubicación**: centrado horizontalmente entre $x_i$ y $x_f$, debajo de la etiqueta $a$ y sobre el eje principal.
+- **Ubicación**: centrado en el eje horizontal principal (viewport `VIEWPORT_WIDTH / 2`), debajo de la etiqueta $a$ y sobre el eje principal. Ya no se posiciona en el punto medio entre $x_i$ y $x_f$ — esto evita que se agrupe con los móviles cuando $x_i$ y $x_f$ están cerca.
 - **Sentido**:
   - $a > 0$: flecha apuntando a la derecha
   - $a < 0$: flecha apuntando a la izquierda
@@ -159,11 +159,11 @@ Cuando hay menos de 4 campos numéricos llenos, se renderiza solo:
 | $x_f$ | **Sobre el cuadrado** cuando está cerca del origen (< 50px), subiendo 18px extra si $x_i$ también está elevado; debajo del tick en caso contrario. Se etiqueta como **xf** |
 | $v_i$ | Encima del vector velocidad inicial, centrado |
 | $v_f$ | Centrada sobre el vector $v_f$, que a su vez está centrado sobre el móvil en $x_f$ |
-| $t$ | En el punto medio horizontal entre $x_i$ y $x_f$, **sobre** la etiqueta $a$ |
-| $a$ | En el punto medio horizontal entre $x_i$ y $x_f$, **debajo** de $t$ y **sobre** el vector aceleración |
+| $t$ | Centrado en el eje horizontal principal (`VIEWPORT_WIDTH / 2`), **sobre** la etiqueta $a$ |
+| $a$ | Centrado en el eje horizontal principal (`VIEWPORT_WIDTH / 2`), **debajo** de $t$ y **sobre** el vector aceleración |
 | $\Delta x$ | En el punto medio entre $x_i$ y $x_f$, debajo de la flecha de desplazamiento |
 
-La pila vertical sobre el eje (de arriba hacia abajo) es: $t$ → $a$ → vector $a$ → eje.
+La pila vertical sobre el eje (de arriba hacia abajo) es: $t$ → $a$ → vector $a$ → eje. El offset vertical de $t$ es `AXIS_Y - charH - LABEL_GAP - 78` y el de $a$ es `AXIS_Y - charH - LABEL_GAP - 48`, con una separación de 30px entre ambos. El vector aceleración se ubica en `AXIS_Y - charH - 41`.
 
 Los vectores de velocidad $v_i$ se posicionan a la altura del centro del móvil, mientras que $v_f$ y su etiqueta se posicionan sobre el móvil en $x_f$.
 
@@ -248,24 +248,26 @@ No hay botón "Generar Diagrama" global — el motor se ejecuta automáticamente
 
 ### 9.3 Comportamiento de acordeón
 
-Las tres tarjetas colapsables funcionan como un grupo de acordeón:
+Las tres tarjetas colapsables funcionan como un grupo de acordeón con transiciones sincronizadas:
 
 - Solo una tarjeta puede estar abierta simultáneamente
-- Al hacer clic en el encabezado de una tarjeta cerrada, se abre y la que estuviera abierta se cierra
+- Al hacer clic en el encabezado de una tarjeta cerrada mientras otra está abierta, la transición de cierre y apertura ocurren **simultáneamente**: ambas tarjetas cambian de estado en el mismo render de React
 - Al hacer clic en el encabezado de la tarjeta actualmente abierta, se cierra (todas colapsan)
 - El estado se maneja con `useState<'datos' | 'elementos' | 'apariencia' | null>('datos')`
 - El callback `handleToggleCard(card)` decide: si la tarjeta clickeada es la misma que la abierta, devuelve `null`; si es otra, devuelve esa
+- La sincronización visual se logra midiendo la altura exacta del contenido via `scrollHeight` (más padding del estado abierto), de modo que ambas transiciones `max-height` recorran el mismo rango y terminen al mismo tiempo
 
 ### 9.4 Animación de despliegue
 
 El colapso y expansión de las tarjetas usa transiciones CSS para una animación suave:
 
-- El cuerpo de la tarjeta usa `max-height` con transición (0.35s): `0` cuando está cerrado, `1000px` cuando está abierto
-- La opacidad transiciona en 0.25s
-- El padding vertical transiciona en 0.3s (de `0` a `0.75rem 1.5rem 1.5rem`)
+- El `max-height` se controla dinámicamente via inline style, midiendo la altura exacta del contenido con `scrollHeight` más el padding del estado abierto (`2.25rem`). Esto asegura que ambas transiciones (apertura y cierre) recorran el mismo rango y terminen sincronizadas
+- Duración de transiciones (20% más rápidas que el valor original):
+  - `max-height`: 0.28s
+  - `opacity`: 0.2s
+  - `padding`: 0.24s
+- El padding vertical transiciona de `0` a `0.75rem 1.5rem 1.5rem`
 - El chevron del encabezado rota 180° con transición de 0.2s
-
-> **Nota:** El límite de `max-height: 1000px` es un valor suficientemente grande para el contenido actual. Si una tarjeta llegara a tener contenido más alto, el contenido se recortaría por el `overflow: hidden`.
 
 ---
 

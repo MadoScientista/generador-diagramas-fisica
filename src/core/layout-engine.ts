@@ -206,7 +206,7 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
         if (vectorPosition === 'final') {
           refX = getFinalScreenX(nodes, posMap);
         } else if (vectorPosition === 'center') {
-          refX = (getInitialScreenX(nodes, posMap) + getFinalScreenX(nodes, posMap)) / 2;
+          refX = VIEWPORT_WIDTH / 2;
         } else {
           refX = getInitialScreenX(nodes, posMap);
         }
@@ -220,7 +220,7 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
             : refX - charW / 2;
         }
         const vy = node.vectorType === 'acceleration'
-          ? AXIS_Y - charH - 18
+          ? AXIS_Y - charH - 41
           : AXIS_Y - charH / 2;
         pos = { x: startX, y: vy };
         w = arrowLen;
@@ -309,11 +309,11 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
           labelX = fx + dir * offset;
           labelY = AXIS_Y - charH / 2 - 14;
         } else if (node.semanticRole === 'label-a') {
-          labelX = (ix + fx) / 2;
-          labelY = AXIS_Y - charH - LABEL_GAP - 25;
+          labelX = VIEWPORT_WIDTH / 2;
+          labelY = AXIS_Y - charH - LABEL_GAP - 48;
         } else if (node.semanticRole === 'label-t') {
-          labelX = (ix + fx) / 2;
-          labelY = AXIS_Y - charH - LABEL_GAP - 55;
+          labelX = VIEWPORT_WIDTH / 2;
+          labelY = AXIS_Y - charH - LABEL_GAP - 78;
         } else if (node.semanticRole === 'label-dx') {
           labelX = (ix + fx) / 2;
           labelY = AXIS_Y + DISPLACEMENT_Y_OFFSET + LABEL_OFFSET_Y;
