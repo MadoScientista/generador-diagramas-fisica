@@ -9,4 +9,7 @@ export default defineConfig({
     babel({ presets: [reactCompilerPreset()] })
   ],
   base: "/generador-diagramas-fisica/",
+  build: {
+    chunkSizeWarningLimit: 700,
+  },
 })

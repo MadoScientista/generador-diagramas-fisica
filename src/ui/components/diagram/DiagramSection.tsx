@@ -14,7 +14,6 @@ interface DiagramSectionProps {
   errorDetail?: string | null;
   diagramFilename?: string;
   graphs: GraphTab[];
-  graphsDisabled?: boolean;
 }
 
 export function DiagramSection({
@@ -23,7 +22,6 @@ export function DiagramSection({
   errorDetail,
   diagramFilename = 'diagrama.svg',
   graphs,
-  graphsDisabled = false,
 }: DiagramSectionProps) {
   const [activeTab, setActiveTab] = useState<'diagram' | 'graphs'>('diagram');
   const [activeGraphTab, setActiveGraphTab] = useState(graphs[0]?.id ?? '');
@@ -34,8 +32,6 @@ export function DiagramSection({
     activeGraph?.svg ?? null,
     activeGraph?.filename,
   );
-
-  const showGraphs = !graphsDisabled && graphs.length > 0;
 
   const handleExport = useCallback(() => {
     if (activeTab === 'diagram') {
@@ -126,35 +122,23 @@ export function DiagramSection({
         ) : (
           <>
             <div className="sub-tabs" role="tablist" aria-label="Tipo de gráfico">
-              {graphs.length > 0 ? (
-                graphs.map((g) => (
-                  <button
-                    key={g.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={g.id === activeGraphTab}
-                    className={`sub-tab${g.id === activeGraphTab ? ' active' : ''}`}
-                    onClick={() => setActiveGraphTab(g.id)}
-                    onKeyDown={(e) => handleSubTabKeyDown(e, g.id)}
-                  >
-                    {g.title}
-                  </button>
-                ))
-              ) : (
-                <>
-                  <span className="sub-tab sub-tab--label">Posición</span>
-                  <span className="sub-tab sub-tab--label">Velocidad</span>
-                  <span className="sub-tab sub-tab--label">Aceleración</span>
-                </>
-              )}
+              {graphs.map((g) => (
+                <button
+                  key={g.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={g.id === activeGraphTab}
+                  className={`sub-tab${g.id === activeGraphTab ? ' active' : ''}`}
+                  onClick={() => setActiveGraphTab(g.id)}
+                  onKeyDown={(e) => handleSubTabKeyDown(e, g.id)}
+                >
+                  {g.title}
+                </button>
+              ))}
             </div>
-            {showGraphs && activeGraph ? (
+            {activeGraph && (
               <div className="graph-panel-body">
                 <div className="graph-svg-container" dangerouslySetInnerHTML={{ __html: activeGraph.svg }} />
-              </div>
-            ) : (
-              <div className="diagram-section-placeholder">
-                <p>Ingrese datos del diagrama</p>
               </div>
             )}
           </>

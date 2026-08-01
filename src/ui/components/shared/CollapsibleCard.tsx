@@ -26,12 +26,12 @@ export function CollapsibleCard({ title, defaultOpen = true, children, open, onT
     setMaxHeight(h + openPad);
   }, []);
 
-  useLayoutEffect(measureHeight, [children]);
+  useLayoutEffect(measureHeight, [children, measureHeight]);
   useLayoutEffect(() => {
     const prev = prevOpenRef.current;
     prevOpenRef.current = isOpen;
     if (isOpen && !prev) measureHeight();
-  }, [isOpen]);
+  }, [isOpen, measureHeight]);
 
   const handleToggle = () => {
     if (onToggle) {

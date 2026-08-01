@@ -23,11 +23,11 @@ Todo diagrama MRUV contiene:
 
 ## 2. Control de visualización de elementos
 
-> El patrón general de la tabla 4 columnas (Etiqueta / Valor / Vector / Móvil) está en AGENTS.md > UI Conventions.
+> El patrón general de la tabla 4 columnas (Símbolo / Valor / Vector / Móvil) está en AGENTS.md > UI Conventions.
 
 Toggles en la tabla dentro del card **"Elementos del diagrama"**:
 
-| Elemento | Etiqueta | Valor | Vector | Móvil |
+| Elemento | Símbolo | Valor | Vector | Móvil |
 |----------|----------|-------|--------|-------|
 | $x_i$ | `xi` / `xi = 0 m` | Activo/Inactivo | — | **Activo/Inactivo** |
 | $x_f$ | `xf` / `xf = 50 m` | Activo/Inactivo | — | **Activo/Inactivo** |
@@ -39,7 +39,7 @@ Toggles en la tabla dentro del card **"Elementos del diagrama"**:
 
 Reglas de visibilidad:
 
-- El checkbox **Valor** se deshabilita automáticamente si **Etiqueta** está destildado
+- El checkbox **Valor** se deshabilita automáticamente si **Símbolo** está destildado
 - **Móvil $x_i$**: controla si se muestra el personaje en la posición inicial. Si está desactivado, no se dibuja el cuadrado/personaje en $x_i$
 - **Móvil $x_f$**: controla si se muestra el personaje en la posición final. Si está activado, se dibuja un segundo cuadrado/personaje en $x_f$
 - **Vector $v_i$**: controla el vector de velocidad inicial en $x_i$. La visibilidad final es AND entre el toggle y $v_i \neq 0$
@@ -53,7 +53,7 @@ Cuando el **Móvil $x_f$** está desactivado:
 
 - El **vector $v_f$** se oculta automáticamente
 - La **etiqueta $v_f$** se oculta automáticamente
-- Los checkboxes de $v_f$ (Etiqueta, Valor, Vector) se **deshabilitan** visualmente
+- Los checkboxes de $v_f$ (Símbolo, Valor, Vector) se **deshabilitan** visualmente
 
 Al reactivar el móvil $x_f$, el vector y la etiqueta $v_f$ reaparecen según el estado de sus toggles.
 
@@ -92,10 +92,13 @@ Los ticks de posición se restringen a una banda de `USABLE_WIDTH - 2 * POSITION
 
 ### 3.4 Gap mínimo entre posiciones
 
-Para evitar que ticks de posiciones muy cercanas aparezcan superpuestos en pantalla, el layout engine impone una **distancia mínima de 50px** entre posiciones físicas distintas (origen, $x_i$, $x_f$).
+Para evitar que ticks de posiciones muy cercanas aparezcan superpuestos en pantalla, el layout engine impone una **distancia mínima dinámica** entre posiciones físicas distintas (origen, $x_i$, $x_f$), calculada en `computeMinGap()`:
 
-- Se prueba primero un mapeo lineal; si todos los gaps entre adyacentes son ≥ 50px, se usa directamente
-- Si algún gap es menor, se redistribuye: cada par adyacente recibe al menos 50px, y el espacio restante se asigna proporcionalmente a sus diferencias físicas
+- Caso base: `halfChar + VECTOR_LENGTH + halfChar` = **130px** (mitad del personaje 50px + vector de velocidad 80px + mitad del personaje)
+- Si hay etiquetas de velocidad ($v_i$/$v_f$), el gap crece según la longitud estimada del texto de la etiqueta (`n.text.length * 4`) para que esta no se superponga con el vector
+
+- Se prueba primero un mapeo lineal; si todos los gaps entre adyacentes son ≥ `minGap`, se usa directamente
+- Si algún gap es menor, se redistribuye: cada par adyacente recibe al menos `minGap`, y el espacio restante se asigna proporcionalmente a sus diferencias físicas
 - Posiciones idénticas en valor físico (ej. origen y $x_i = 0$) ocupan el mismo punto en pantalla
 
 ### 3.5 Diagrama base (sin inputs)
@@ -169,8 +172,8 @@ Los vectores de velocidad $v_i$ se posicionan a la altura del centro del móvil,
 
 ### 6.2 Control de visibilidad
 
-- **Etiqueta**: si está desactivado, el nodo completo se oculta del SVG
-- **Valor**: si está activado, la etiqueta muestra `{id} = {valor} {unidad}`; si no, solo `{id}`. Solo disponible si Etiqueta está activo
+- **Símbolo**: si está desactivado, el nodo completo se oculta del SVG
+- **Valor**: si está activado, la etiqueta muestra `{id} = {valor} {unidad}`; si no, solo `{id}`. Solo disponible si Símbolo está activo
 - **Vector**: controla la visibilidad de $v_i$, $v_f$, $a$ o $\Delta x$. La visibilidad final es AND entre el toggle y la condición física ($v_i \neq 0$, $v_f \neq 0$, $a \neq 0$ o $\Delta x \neq 0$)
 - **Etiqueta $v_f$**: desaparece si el vector $v_f$ no es visible (por toggle desactivado, $v_f = 0$, o móvil $x_f$ oculto)
 
@@ -181,7 +184,7 @@ Los vectores de velocidad $v_i$ se posicionan a la altura del centro del móvil,
 Debajo del eje principal hay un segundo eje horizontal:
 
 - **Desde** $x_i$ **hasta** $x_f$
-- Dirección de la punta = signo del desplazamiento (→ si $v_i > 0$, ← si $v_i < 0$)
+- Dirección de la punta = signo del desplazamiento (→ si $\Delta x > 0$, ← si $\Delta x < 0$)
 - Es una línea continua con punta de flecha (sin dashed)
 - La línea termina en la base del triángulo (misma lógica que los vectores velocidad)
 
@@ -221,7 +224,7 @@ Las tres tarjetas usan un patrón de **acordeón controlado**: solo una puede es
   - Los placeholders de los campos muestran subíndices con HTML `<sub>` mediante `identToHTML`: `xi` → `x<sub>i</sub>`, `xf` → `x<sub>f</sub>`, `vi` → `v<sub>i</sub>`, `vf` → `v<sub>f</sub>`.
   - Las unidades en el dropdown se renderizan con HTML `<sup>` mediante `displayUnitHTML`: `m/s^2` → `m/s<sup>2</sup>`.
   - El dropdown y el input comparten `font-size: 1rem`, `line-height: normal` y `padding` idéntico para igualar alturas.
-- **Card 2 - "Elementos del diagrama"** (`DiagramControlsCardMRUV`): envuelta en `CollapsibleCard` controlada con `open={openCard === 'elementos'}`. Tabla de controles con 7 filas ($x_i$, $x_f$, $v_i$, $v_f$, $a$, $t$, $\Delta x$). Columnas: *Etiqueta*, *Valor*, *Vector*, *Móvil*. Los checkboxes de $v_f$ se deshabilitan cuando el móvil $x_f$ está desactivado.
+- **Card 2 - "Elementos del diagrama"** (`DiagramControlsCardMRUV`): envuelta en `CollapsibleCard` controlada con `open={openCard === 'elementos'}`. Tabla de controles con 7 filas ($x_i$, $x_f$, $v_i$, $v_f$, $a$, $t$, $\Delta x$). Columnas: *Símbolo*, *Valor*, *Vector*, *Móvil*. Los checkboxes de $v_f$ se deshabilitan cuando el móvil $x_f$ está desactivado.
 - **Card 3 - "Apariencia diagrama"** (`DiagramAppearanceCard`): envuelta en `CollapsibleCard` controlada con `open={openCard === 'apariencia'}`. Selectores de personaje (cuadrado, persona, bicicleta, automóvil) y fondo (blanco, parque, ciudad, playa).
 
 No hay botón "Generar Diagrama" global — el motor se ejecuta automáticamente cuando los datos son suficientes.
@@ -235,6 +238,7 @@ No hay botón "Generar Diagrama" global — el motor se ejecuta automáticamente
 - **Pill (`.view-switcher-inner`)**: fondo `#f4f3ef`, borde `#e5e3da`, border-radius 999px, padding 3px. Tab activo: fondo blanco + sombra, texto `#1a1a18`. Tab inactivo: texto `#6b6a63`.
 - **Sub-tabs**: `border-bottom: 1px solid #e5e3da` a lo ancho de la tarjeta. Tabs con `padding: 0.5rem 1.25rem`, texto `#a3a199` (inactivo) / `#1a1a18` con `border-bottom: 2px solid #6b6a63` (activo).
 - **Estados vacío/error**: placeholder con `height: 474px`, texto en itálica, color `#888`.
+- **Estiramiento vertical**: la sección derecha usa la clase `diagram-section--stretch` (solo en la página MRUV). La tarjeta del diagrama (`.diagram-section-card`) hace `flex: 1` y el `.diagram-section-body` también crece, de modo que el **borde inferior de la tarjeta calza con el borde inferior de la tarjeta "Apariencia diagrama"** de la columna izquierda, sin importar qué tarjetas del acordeón estén abiertas.
 
 ### 9.2 Estilos
 
@@ -298,7 +302,7 @@ La variable calculada se auto-rellena y se marca como **computada**. Si el usuar
 
 Al cambiar una unidad mientras los campos están llenos, se limpia el campo correspondiente y el motor lo re-computa en la nueva unidad. Para forzar una re-evaluación manual, el usuario puede presionar **Enter** en cualquier campo o borrar y re-ingresar un valor.
 
-### 10.1 Campos ocultos
+### 11.1 Campos ocultos
 
 Los campos $x_f$ y $v_f$ están ocultos del formulario pero toda la lógica subyacente se mantiene:
 
