@@ -224,8 +224,8 @@ Las tres tarjetas usan un patrón de **acordeón controlado**: solo una puede es
   - Los placeholders de los campos muestran subíndices con HTML `<sub>` mediante `identToHTML`: `xi` → `x<sub>i</sub>`, `xf` → `x<sub>f</sub>`, `vi` → `v<sub>i</sub>`, `vf` → `v<sub>f</sub>`.
   - Las unidades en el dropdown se renderizan con HTML `<sup>` mediante `displayUnitHTML`: `m/s^2` → `m/s<sup>2</sup>`.
   - El dropdown y el input comparten `font-size: 1rem`, `line-height: normal` y `padding` idéntico para igualar alturas.
-- **Card 2 - "Elementos del diagrama"** (`DiagramControlsCardMRUV`): envuelta en `CollapsibleCard` controlada con `open={openCard === 'elementos'}`. Tabla de controles con 7 filas ($x_i$, $x_f$, $v_i$, $v_f$, $a$, $t$, $\Delta x$). Columnas: *Símbolo*, *Valor*, *Vector*, *Móvil*. Los checkboxes de $v_f$ se deshabilitan cuando el móvil $x_f$ está desactivado.
-- **Card 3 - "Apariencia diagrama"** (`DiagramAppearanceCard`): envuelta en `CollapsibleCard` controlada con `open={openCard === 'apariencia'}`. Selectores de personaje (cuadrado, persona, bicicleta, automóvil) y fondo (blanco, parque, ciudad, playa).
+- **Card 2 - "Elementos del diagrama"** (`DiagramControlsCardMRUV`): envuelta en `CollapsibleCard` controlada con `open={openCard === 'elementos'}`. Tabla de controles con 7 filas ($x_i$, $x_f$, $v_i$, $v_f$, $a$, $t$, $\Delta x$). Columnas: *Símbolo*, *Valor*, *Vector*, *Móvil*. Los checkboxes de $v_f$ se deshabilitan cuando el móvil $x_f$ está desactivado. Las filas de datos alternan en modo cebra (fondo `#f7f7f7` en las filas pares vía la clase `.controls-row-zebra`); el encabezado queda sin fondo.
+- **Card 3 - "Apariencia del diagrama"** (`DiagramAppearanceCard`): envuelta en `CollapsibleCard` controlada con `open={openCard === 'apariencia'}`. Selector "Movil" (cuadrado, persona, bicicleta, automóvil) y selector "Suelo" (Línea, Pasto, Calle, Playa). El valor de "Suelo" solo se almacena en estado local por ahora — no se pasa al motor ni al renderer (a implementar en una iteración futura).
 
 No hay botón "Generar Diagrama" global — el motor se ejecuta automáticamente cuando los datos son suficientes.
 
@@ -238,7 +238,7 @@ No hay botón "Generar Diagrama" global — el motor se ejecuta automáticamente
 - **Pill (`.view-switcher-inner`)**: fondo `#f4f3ef`, borde `#e5e3da`, border-radius 999px, padding 3px. Tab activo: fondo blanco + sombra, texto `#1a1a18`. Tab inactivo: texto `#6b6a63`.
 - **Sub-tabs**: `border-bottom: 1px solid #e5e3da` a lo ancho de la tarjeta. Tabs con `padding: 0.5rem 1.25rem`, texto `#a3a199` (inactivo) / `#1a1a18` con `border-bottom: 2px solid #6b6a63` (activo).
 - **Estados vacío/error**: placeholder con `height: 474px`, texto en itálica, color `#888`.
-- **Estiramiento vertical**: la sección derecha usa la clase `diagram-section--stretch` (solo en la página MRUV). La tarjeta del diagrama (`.diagram-section-card`) hace `flex: 1` y el `.diagram-section-body` también crece, de modo que el **borde inferior de la tarjeta calza con el borde inferior de la tarjeta "Apariencia diagrama"** de la columna izquierda, sin importar qué tarjetas del acordeón estén abiertas.
+- **Estiramiento vertical**: la sección derecha usa la clase `diagram-section--stretch` (solo en la página MRUV). La tarjeta del diagrama (`.diagram-section-card`) hace `flex: 1` y el `.diagram-section-body` también crece, de modo que el **borde inferior de la tarjeta calza con el borde inferior de la tarjeta "Apariencia del diagrama"** de la columna izquierda, sin importar qué tarjetas del acordeón estén abiertas.
 
 ### 9.2 Estilos
 
@@ -248,7 +248,7 @@ No hay botón "Generar Diagrama" global — el motor se ejecuta automáticamente
 |---------|---------------|-------------------|
 | "Datos del diagrama" | Abierta (valor inicial de `openCard`: `'datos'`) | `DiagramDataCardMRUV` con `showTitle={false}` |
 | "Elementos del diagrama" | Cerrada | `DiagramControlsCardMRUV` con `showTitle={false}` |
-| "Apariencia diagrama" | Cerrada | `DiagramAppearanceCard` |
+| "Apariencia del diagrama" | Cerrada | `DiagramAppearanceCard` |
 
 ### 9.3 Comportamiento de acordeón
 

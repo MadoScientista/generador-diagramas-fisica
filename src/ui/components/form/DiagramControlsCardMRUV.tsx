@@ -8,13 +8,14 @@ interface ControlRowMRUVProps {
   control: ElementControls & { showCharacter?: boolean };
   onControlChange: (element: keyof DiagramControls, field: keyof ElementControls | 'showCharacter', value: boolean) => void;
   disabled?: boolean;
+  index?: number;
 }
 
-function ControlRowMRUV({ id, label, hasVector, hasCharacter, control, onControlChange, disabled }: ControlRowMRUVProps) {
+function ControlRowMRUV({ id, label, hasVector, hasCharacter, control, onControlChange, disabled, index }: ControlRowMRUVProps) {
   const showValueDisabled = !control.showLabel || disabled;
 
   return (
-    <div className="controls-row">
+    <div className={index !== undefined && index % 2 === 1 ? 'controls-row controls-row-zebra' : 'controls-row'}>
       <span className="controls-cell element-label">{label}</span>
       <span className="controls-cell">
         <input
@@ -81,7 +82,7 @@ export function DiagramControlsCardMRUV({ controls, onControlChange, showTitle =
         <span className="controls-cell">Vector</span>
         <span className="controls-cell">Móvil</span>
       </div>
-      {CONTROL_ROWS.map((row) => (
+      {CONTROL_ROWS.map((row, i) => (
         <ControlRowMRUV
           key={row.id}
           id={row.id}
@@ -91,6 +92,7 @@ export function DiagramControlsCardMRUV({ controls, onControlChange, showTitle =
           control={controls[row.id]}
           onControlChange={onControlChange}
           disabled={row.id === 'vf' && !controls.xf.showCharacter}
+          index={i}
         />
       ))}
     </div>

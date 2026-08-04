@@ -6,7 +6,7 @@ import { DiagramControlsCard } from '../ui/components/form/DiagramControlsCard.t
 import { DiagramContainer } from '../ui/components/diagram/DiagramContainer.tsx';
 import { CollapsibleCard } from '../ui/components/shared/CollapsibleCard.tsx';
 import { DiagramAppearanceCard } from '../ui/components/form/DiagramAppearanceCard.tsx';
-import type { CharacterType, BackgroundType } from '../ui/components/form/DiagramAppearanceCard.tsx';
+import type { CharacterType } from '../ui/components/form/DiagramAppearanceCard.tsx';
 import type { DiagramControls } from '../modules/mru/types.ts';
 
 const MRU_DEFAULTS: DiagramControls = {
@@ -21,7 +21,6 @@ export function MRUV2GeneratorPage() {
   const { controls, handleControlChange, resetControls } = useDiagramControls(MRU_DEFAULTS);
 
   const [character, setCharacter] = useState<CharacterType>('square');
-  const [background, setBackground] = useState<BackgroundType>('white');
 
   const {
     values,
@@ -38,7 +37,6 @@ export function MRUV2GeneratorPage() {
     clearAll();
     resetControls();
     setCharacter('square');
-    setBackground('white');
   };
 
   return (
@@ -69,9 +67,7 @@ export function MRUV2GeneratorPage() {
           <CollapsibleCard title="Apariencia diagrama" defaultOpen={false}>
             <DiagramAppearanceCard
               character={character}
-              background={background}
               onCharacterChange={setCharacter}
-              onBackgroundChange={setBackground}
             />
           </CollapsibleCard>
           <button type="submit">

@@ -436,6 +436,10 @@ body {
   display: contents;
 }
 
+.controls-row-zebra .controls-cell {
+  background-color: #f7f7f7;
+}
+
 .controls-header {
   font-weight: 600;
   color: #555;

@@ -11,7 +11,7 @@ import { VelocityTimeGraph } from '../ui/components/diagram/graphs/VelocityTimeG
 import { PositionTimeGraph } from '../ui/components/diagram/graphs/PositionTimeGraph.tsx';
 import { computeGraphData } from '../modules/mruv/graph-helpers.ts';
 import { toSI } from '../core/units.ts';
-import type { CharacterType, BackgroundType } from '../ui/components/form/DiagramAppearanceCard.tsx';
+import type { CharacterType, GroundType } from '../ui/components/form/DiagramAppearanceCard.tsx';
 import type { DiagramControls } from '../modules/mruv/types.ts';
 
 const MRUV_DEFAULTS: DiagramControls = {
@@ -28,7 +28,7 @@ export function MRUVGeneratorPage() {
   const { controls, handleControlChange, resetControls } = useDiagramControls(MRUV_DEFAULTS);
 
   const [character, setCharacter] = useState<CharacterType>('square');
-  const [background, setBackground] = useState<BackgroundType>('white');
+  const [ground, setGround] = useState<GroundType>('line');
   const [openCard, setOpenCard] = useState<'datos' | 'elementos' | 'apariencia' | null>('datos');
 
   const handleToggleCard = useCallback((card: 'datos' | 'elementos' | 'apariencia') => {
@@ -76,7 +76,7 @@ export function MRUVGeneratorPage() {
     clearAll();
     resetControls();
     setCharacter('square');
-    setBackground('white');
+    setGround('line');
   };
 
   return (
@@ -106,12 +106,12 @@ export function MRUVGeneratorPage() {
             showTitle={false}
           />
         </CollapsibleCard>
-        <CollapsibleCard title="Apariencia diagrama" open={openCard === 'apariencia'} onToggle={() => handleToggleCard('apariencia')}>
+        <CollapsibleCard title="Apariencia del diagrama" open={openCard === 'apariencia'} onToggle={() => handleToggleCard('apariencia')}>
           <DiagramAppearanceCard
             character={character}
-            background={background}
+            ground={ground}
             onCharacterChange={setCharacter}
-            onBackgroundChange={setBackground}
+            onGroundChange={setGround}
           />
         </CollapsibleCard>
       </section>
