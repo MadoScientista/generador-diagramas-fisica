@@ -1,7 +1,6 @@
-import type { CharacterType } from '../../../core/types.ts';
+import type { CharacterType, GroundType } from '../../../core/types.ts';
 
-export type { CharacterType };
-export type GroundType = 'line' | 'grass' | 'street' | 'beach';
+export type { CharacterType, GroundType };
 
 interface DiagramAppearanceProps {
   character: CharacterType;

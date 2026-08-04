@@ -1,5 +1,5 @@
 import type { DistanceUnit, TimeUnit, VelocityUnit, AccelerationUnit } from '../../core/units.ts';
-import type { CharacterType } from '../../core/types.ts';
+import type { CharacterType, GroundType } from '../../core/types.ts';
 
 export interface ElementControls {
   showLabel: boolean;
@@ -89,4 +89,5 @@ export interface MRUVDiagramModel {
   timeUnit: TimeUnit;
   controls: DiagramControls;
   characterType: CharacterType;
+  ground: GroundType;
 }

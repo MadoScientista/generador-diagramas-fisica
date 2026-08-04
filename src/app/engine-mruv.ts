@@ -4,6 +4,7 @@ import type {
   PipelineError,
   SceneGraph,
   CharacterType,
+  GroundType,
 } from '../core/types.ts';
 import type { DistanceUnit, TimeUnit, VelocityUnit, AccelerationUnit } from '../core/units.ts';
 import type { DiagramControls } from '../modules/mruv/types.ts';
@@ -20,6 +21,7 @@ interface GenerateOptions {
   timeUnit: TimeUnit;
   controls: DiagramControls;
   characterType?: CharacterType;
+  ground?: GroundType;
 }
 
 interface PipelineResultExtended {
@@ -43,14 +45,14 @@ export class PhysicsDiagramEngineMRUV {
   }
 
   generate(opts: GenerateOptions): PipelineResultExtended {
-    const { moduleId, rawInput, xiUnit, xfUnit, viUnit, vfUnit, aUnit, timeUnit, controls, characterType = 'square' } = opts;
+    const { moduleId, rawInput, xiUnit, xfUnit, viUnit, vfUnit, aUnit, timeUnit, controls, characterType = 'square', ground = 'line' } = opts;
 
     const filledFields = ALL_FIELDS.filter(
       (k) => rawInput[k]?.trim() !== ''
     );
 
     if (filledFields.length < 4) {
-      return this.renderBase(characterType);
+      return this.renderBase(characterType, ground);
     }
 
     const module = this.registry.get(moduleId);
@@ -101,6 +103,7 @@ export class PhysicsDiagramEngineMRUV {
       timeUnit,
       controls,
       characterType,
+      ground,
     };
 
     let diagramModel;
@@ -149,12 +152,18 @@ export class PhysicsDiagramEngineMRUV {
     };
   }
 
-  private renderBase(characterType: CharacterType = 'square'): PipelineResultExtended & { type: 'success' } {
+  private renderBase(characterType: CharacterType = 'square', ground: GroundType = 'line'): PipelineResultExtended & { type: 'success' } {
     const baseScene: SceneGraph = {
       id: 'scene',
       type: 'scene',
       visible: true,
       children: [
+        {
+          id: 'ground',
+          type: 'ground',
+          visible: ground !== 'line',
+          groundType: ground,
+        },
         {
           id: 'axis-x',
           type: 'axis',

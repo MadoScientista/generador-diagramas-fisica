@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { usePhysicsEngineMRUV } from './usePhysicsEngineMRUV.ts';
 import { formatValue } from '../core/format.ts';
-import type { PipelineResult, CharacterType } from '../core/types.ts';
+import type { PipelineResult, CharacterType, GroundType } from '../core/types.ts';
 import type { DistanceUnit, TimeUnit, VelocityUnit, AccelerationUnit } from '../core/units.ts';
 import type { DiagramControls } from '../modules/mruv/types.ts';
 
@@ -17,7 +17,7 @@ interface ResolvedValues {
 
 const ALL_FIELDS = ['xi', 'xf', 'vi', 'vf', 'a', 't'] as const;
 
-export function useMRUVDiagram(controls: DiagramControls, characterType: CharacterType = 'square') {
+export function useMRUVDiagram(controls: DiagramControls, characterType: CharacterType = 'square', ground: GroundType = 'line') {
   const { engine } = usePhysicsEngineMRUV();
 
   const [xi, setXi] = useState('');
@@ -104,6 +104,7 @@ export function useMRUVDiagram(controls: DiagramControls, characterType: Charact
       timeUnit,
       controls,
       characterType,
+      ground,
     });
 
     if (res.type === 'success' && res.resolvedValues) {
@@ -133,7 +134,7 @@ export function useMRUVDiagram(controls: DiagramControls, characterType: Charact
     }
 
     setResult(res as PipelineResult);
-  }, [buildInput, engine, xiUnit, xfUnit, viUnit, vfUnit, aUnit, timeUnit, controls, characterType]);
+  }, [buildInput, engine, xiUnit, xfUnit, viUnit, vfUnit, aUnit, timeUnit, controls, characterType, ground]);
 
   const handleCalculate = useCallback(() => {
     runEngine();
@@ -164,7 +165,7 @@ export function useMRUVDiagram(controls: DiagramControls, characterType: Charact
     const id = setTimeout(() => runEngine(), 0);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [xi, xf, vi, vf, a, t, xiUnit, xfUnit, viUnit, vfUnit, aUnit, timeUnit, controls, characterType]);
+  }, [xi, xf, vi, vf, a, t, xiUnit, xfUnit, viUnit, vfUnit, aUnit, timeUnit, controls, characterType, ground]);
 
   return {
     values: { xi, xf, vi, vf, a, t },

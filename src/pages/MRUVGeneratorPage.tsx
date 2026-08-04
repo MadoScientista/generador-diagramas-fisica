@@ -44,7 +44,7 @@ export function MRUVGeneratorPage() {
     handleChange,
     handleUnitChange,
     clearAll,
-  } = useMRUVDiagram(controls, character);
+  } = useMRUVDiagram(controls, character, ground);
 
   const graphData = useMemo(() => {
     if (!resolvedValues) return null;

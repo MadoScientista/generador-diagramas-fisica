@@ -457,6 +457,10 @@ body {
   padding-left: 0;
 }
 
+.controls-cell.element-label .element-symbol {
+  font-size: 0.95rem;
+}
+
 .controls-cell input[type='checkbox'] {
   cursor: pointer;
   width: 1rem;

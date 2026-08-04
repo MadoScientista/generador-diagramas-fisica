@@ -2,6 +2,46 @@ import type { LayoutScene, PositionedNode, CharacterType } from './types.ts';
 import { getSpriteConfig } from './sprite-registry.ts';
 
 const TICK_SIZE = 8;
+const GROUND_OFFSET = 10;
+
+function renderGround(node: PositionedNode): string {
+  const { position, boundingBox } = node;
+  const x = position.x;
+  const y = position.y;
+  const w = boundingBox.width;
+  const h = boundingBox.height || GROUND_OFFSET;
+  const groundType =
+    node.node.type === 'ground' ? node.node.groundType : 'line';
+
+  switch (groundType) {
+    case 'grass': {
+      let blades = '';
+      for (let bx = x + 10; bx < x + w; bx += 20) {
+        blades += `<path d="M ${bx} ${y + h} l 2 -5 l 2 5 z" fill="#3f8a33" />`;
+      }
+      return `
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#6aab3f" />
+    <line x1="${x}" y1="${y}" x2="${x + w}" y2="${y}" stroke="#4c8a2a" stroke-width="1.5" />
+    ${blades}`;
+    }
+    case 'street':
+      return `
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#5a5a5a" />
+    <line x1="${x}" y1="${y + h / 2}" x2="${x + w}" y2="${y + h / 2}" stroke="#f2f2f2" stroke-width="1.5" stroke-dasharray="8 6" />`;
+    case 'beach': {
+      let dots = '';
+      for (let dx = x + 8; dx < x + w; dx += 16) {
+        dots += `<circle cx="${dx}" cy="${y + h / 2}" r="1.2" fill="#cbb97a" />`;
+      }
+      return `
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#e8d9a0" />
+    <line x1="${x}" y1="${y}" x2="${x + w}" y2="${y}" stroke="#cbb97a" stroke-width="1.5" />
+    ${dots}`;
+    }
+    default:
+      return '';
+  }
+}
 
 function renderAxis(node: PositionedNode): string {
   const { position, boundingBox } = node;
@@ -132,6 +172,7 @@ export function render(layoutScene: LayoutScene): string {
 
   const sorted = [...nodes].sort((a, b) => {
     const order: Record<string, number> = {
+      ground: -1,
       axis: 0,
       positions: 1,
       character: 2,
@@ -149,6 +190,9 @@ export function render(layoutScene: LayoutScene): string {
     if (!pn.visible) continue;
 
     switch (pn.node.type) {
+      case 'ground':
+        elements.push(renderGround(pn));
+        break;
       case 'axis':
         elements.push(renderAxis(pn));
         break;

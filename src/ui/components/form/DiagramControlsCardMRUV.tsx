@@ -1,4 +1,5 @@
 import type { DiagramControls, ElementControls } from '../../../modules/mruv/types.ts';
+import { identToHTML } from '../../../core/format.ts';
 
 interface ControlRowMRUVProps {
   id: keyof DiagramControls;
@@ -13,10 +14,13 @@ interface ControlRowMRUVProps {
 
 function ControlRowMRUV({ id, label, hasVector, hasCharacter, control, onControlChange, disabled, index }: ControlRowMRUVProps) {
   const showValueDisabled = !control.showLabel || disabled;
+  const richLabel = identToHTML(label) ?? label;
 
   return (
     <div className={index !== undefined && index % 2 === 1 ? 'controls-row controls-row-zebra' : 'controls-row'}>
-      <span className="controls-cell element-label">{label}</span>
+      <span className="controls-cell element-label">
+        <span className="element-symbol" dangerouslySetInnerHTML={{ __html: richLabel }} />
+      </span>
       <span className="controls-cell">
         <input
           type="checkbox"

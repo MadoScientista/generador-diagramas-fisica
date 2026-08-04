@@ -1,7 +1,7 @@
 import type { MRUVResult, MRUVDiagramModel, DiagramControls } from './types.ts';
-import type { CharacterType } from '../../core/types.ts';
+import type { CharacterType, GroundType } from '../../core/types.ts';
 
-export function inferMRUV(result: MRUVResult & { controls?: DiagramControls; characterType?: CharacterType }): MRUVDiagramModel {
+export function inferMRUV(result: MRUVResult & { controls?: DiagramControls; characterType?: CharacterType; ground?: GroundType }): MRUVDiagramModel {
   const controls = result.controls ?? {
     xi: { showLabel: true, showValue: true },
     xf: { showLabel: true, showValue: true },
@@ -63,5 +63,6 @@ export function inferMRUV(result: MRUVResult & { controls?: DiagramControls; cha
     timeUnit: result.timeUnit,
     controls,
     characterType: result.characterType ?? 'square',
+    ground: result.ground ?? 'line',
   };
 }

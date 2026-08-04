@@ -8,6 +8,7 @@ import type {
   CharacterType,
   VectorNode,
   PositionNode,
+  GroundNode,
 } from './types.ts';
 import { getSpriteConfig } from './sprite-registry.ts';
 
@@ -23,9 +24,12 @@ const AXIS_LINE_WIDTH = 760;
 const LABEL_OFFSET_Y = 22;
 const LABEL_GAP = 10;
 const DISPLACEMENT_Y_OFFSET = 55;
+const GROUND_OFFSET = 10;
 
 function getLayer(node: SceneGraphNode): Layer {
   switch (node.type) {
+    case 'ground':
+      return 'ground';
     case 'axis':
       return 'axis';
     case 'origin':
@@ -151,6 +155,13 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
   const positioned: PositionedNode[] = [];
   const { w: charW, h: charH } = getCharDimensions(nodes);
 
+  const hasGround = nodes.some(
+    (n): n is GroundNode => n.type === 'ground' && n.visible && n.groundType !== 'line'
+  );
+  const groundOffset = hasGround ? GROUND_OFFSET : 0;
+  const axisY = AXIS_Y + groundOffset;
+  const groundX = (VIEWPORT_WIDTH - AXIS_LINE_WIDTH) / 2;
+
   for (const node of nodes) {
     if (!node.visible) {
       positioned.push({
@@ -170,21 +181,27 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
     let h = 0;
 
     switch (node.type) {
+      case 'ground':
+        pos = { x: groundX, y: AXIS_Y };
+        w = AXIS_LINE_WIDTH;
+        h = GROUND_OFFSET;
+        break;
+
       case 'axis':
-        pos = { x: (VIEWPORT_WIDTH - AXIS_LINE_WIDTH) / 2, y: AXIS_Y };
+        pos = { x: groundX, y: axisY };
         w = AXIS_LINE_WIDTH;
         break;
 
       case 'origin': {
         const sx = posMap.get(0)!;
-        pos = { x: sx, y: AXIS_Y };
+        pos = { x: sx, y: axisY };
         h = TICK_SIZE;
         break;
       }
 
       case 'position': {
         const sx = posMap.get(node.physicalValue)!;
-        pos = { x: sx, y: AXIS_Y };
+        pos = { x: sx, y: axisY };
         h = TICK_SIZE;
         break;
       }
@@ -230,7 +247,7 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
       case 'displacement-arrow': {
         const sx = posMap.get(node.physicalXi)!;
         const ex = posMap.get(node.physicalXf)!;
-        const arrowY = AXIS_Y + DISPLACEMENT_Y_OFFSET;
+        const arrowY = axisY + DISPLACEMENT_Y_OFFSET;
         pos = { x: Math.min(sx, ex), y: arrowY };
         w = Math.abs(ex - sx);
         break;
@@ -240,7 +257,7 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
         const ix = getInitialScreenX(nodes, posMap);
         const fx = getFinalScreenX(nodes, posMap);
         let labelX = ix;
-        let labelY = AXIS_Y + TICK_SIZE + LABEL_OFFSET_Y;
+        let labelY = axisY + TICK_SIZE + LABEL_OFFSET_Y;
 
         if (node.semanticRole === 'label-xi') {
           const originSx = posMap.get(0)!;
@@ -249,7 +266,7 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
           if (screenDist < 50) {
             labelY = AXIS_Y - charH - LABEL_GAP;
           } else {
-            labelY = AXIS_Y + TICK_SIZE + LABEL_OFFSET_Y;
+            labelY = axisY + TICK_SIZE + LABEL_OFFSET_Y;
           }
         } else if (node.semanticRole === 'label-xf') {
           labelX = fx;
@@ -276,7 +293,7 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
               ? AXIS_Y - charH - LABEL_GAP - 18
               : AXIS_Y - charH - LABEL_GAP;
           } else {
-            labelY = AXIS_Y + TICK_SIZE + LABEL_OFFSET_Y;
+            labelY = axisY + TICK_SIZE + LABEL_OFFSET_Y;
           }
         } else if (node.semanticRole === 'label-v') {
           const dir = ix <= fx ? 1 : -1;
@@ -316,7 +333,7 @@ export function layout(sceneGraph: SceneGraph): LayoutScene {
           labelY = AXIS_Y - charH - LABEL_GAP - 78;
         } else if (node.semanticRole === 'label-dx') {
           labelX = (ix + fx) / 2;
-          labelY = AXIS_Y + DISPLACEMENT_Y_OFFSET + LABEL_OFFSET_Y;
+          labelY = axisY + DISPLACEMENT_Y_OFFSET + LABEL_OFFSET_Y;
         }
 
         pos = { x: labelX, y: labelY };

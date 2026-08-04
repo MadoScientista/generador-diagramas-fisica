@@ -1,5 +1,6 @@
 export type AxisType = 'x' | 'y';
 export type CharacterType = 'square' | 'person' | 'bike' | 'car';
+export type GroundType = 'line' | 'grass' | 'street' | 'beach';
 export type Orientation = 'left' | 'right' | 'none' | 'up' | 'down';
 export type SemanticRole =
   | 'initial'
@@ -19,7 +20,7 @@ export type SemanticRole =
   | 'label-t'
   | 'custom';
 export type VectorType = 'velocity' | 'acceleration' | 'force' | 'electric-field';
-export type Layer = 'background' | 'axis' | 'positions' | 'character' | 'vectors' | 'displacement' | 'labels';
+export type Layer = 'ground' | 'background' | 'axis' | 'positions' | 'character' | 'vectors' | 'displacement' | 'labels';
 
 export interface NodeBase {
   id: string;
@@ -87,6 +88,11 @@ export interface DisplacementArrowNode extends NodeBase {
   physicalXf: number;
 }
 
+export interface GroundNode extends NodeBase {
+  type: 'ground';
+  groundType: GroundType;
+}
+
 export interface GroupNode extends NodeBase {
   type: 'group';
   children: SceneGraphNode[];
@@ -101,6 +107,7 @@ export type SceneGraphNode =
   | VectorNode
   | LabelNode
   | DisplacementArrowNode
+  | GroundNode
   | GroupNode;
 
 export interface Point {

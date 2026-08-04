@@ -31,6 +31,12 @@ export function buildMRUVScene(model: MRUVDiagramModel): SceneGraph {
     visible: true,
     children: [
       {
+        id: 'ground',
+        type: 'ground',
+        visible: model.ground !== 'line',
+        groundType: model.ground ?? 'line',
+      },
+      {
         id: 'axis-x',
         type: 'axis',
         visible: true,
