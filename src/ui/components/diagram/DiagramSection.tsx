@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useExportSVG } from '../../../hooks/useExportSVG.ts';
+import { useExportPNG } from '../../../hooks/useExportPNG.ts';
 
 interface GraphTab {
   id: string;
@@ -16,6 +17,10 @@ interface DiagramSectionProps {
   graphs: GraphTab[];
 }
 
+function pngName(name: string): string {
+  return name.replace(/\.svg$/i, '.png');
+}
+
 export function DiagramSection({
   svg,
   error,
@@ -27,19 +32,32 @@ export function DiagramSection({
   const [activeGraphTab, setActiveGraphTab] = useState(graphs[0]?.id ?? '');
 
   const { exportSVG: exportDiagram } = useExportSVG(svg, diagramFilename);
+  const { exportPNG: exportDiagramPNG } = useExportPNG(svg, pngName(diagramFilename));
   const activeGraph = graphs.find((g) => g.id === activeGraphTab);
   const { exportSVG: exportGraph, isReady: graphReady } = useExportSVG(
     activeGraph?.svg ?? null,
     activeGraph?.filename,
   );
+  const { exportPNG: exportGraphPNG } = useExportPNG(
+    activeGraph?.svg ?? null,
+    activeGraph?.filename ? pngName(activeGraph.filename) : 'grafico.png',
+  );
 
-  const handleExport = useCallback(() => {
+  const handleExportSVG = useCallback(() => {
     if (activeTab === 'diagram') {
       exportDiagram();
     } else {
       exportGraph();
     }
   }, [activeTab, exportDiagram, exportGraph]);
+
+  const handleExportPNG = useCallback(() => {
+    if (activeTab === 'diagram') {
+      exportDiagramPNG();
+    } else {
+      exportGraphPNG();
+    }
+  }, [activeTab, exportDiagramPNG, exportGraphPNG]);
 
   const isExportDisabled = activeTab === 'diagram' ? !svg : !graphReady;
 
@@ -91,9 +109,14 @@ export function DiagramSection({
             Gráficos
           </button>
         </div>
-        <button onClick={handleExport} disabled={isExportDisabled} className="export-button">
-          Exportar
-        </button>
+        <div className="export-actions">
+          <button onClick={handleExportSVG} disabled={isExportDisabled} className="export-button">
+            Exportar SVG
+          </button>
+          <button onClick={handleExportPNG} disabled={isExportDisabled} className="export-button">
+            Exportar PNG
+          </button>
+        </div>
       </div>
 
       <div className="card-body">

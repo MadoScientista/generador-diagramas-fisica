@@ -10,6 +10,15 @@ body {
   background: #fafafa;
 }
 
+:root {
+  --plano-paper: #faf9f5;
+  --plano-ink: #1f2430;
+  --plano-grid: #b8c4d9;
+  --plano-line: #e5e1d6;
+  --plano-accent: #2563eb;
+  --plano-mono: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
+}
+
 /* ── Page Layout ─────────────────────────────────────── */
 
 .page-layout {
@@ -595,6 +604,17 @@ body {
   margin-left: auto;
 }
 
+.export-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.export-actions .export-button {
+  margin-left: 0;
+}
+
 .card-body {
   display: flex;
   flex-direction: column;
@@ -889,36 +909,274 @@ body {
   height: 400px;
 }
 
-/* ── Plano Cartesiano ────────────────────────────────── */
+/* ── Plano Cartesiano (rediseño) ─────────────────────── */
 
 .plano-card-title {
-  font-size: 1.1rem;
+  font-family: var(--plano-mono);
+  font-size: 1.05rem;
   font-weight: 600;
-  color: #333;
+  letter-spacing: -0.01em;
+  color: var(--plano-ink);
+}
+
+.plano-page .diagram-section-card {
+  border-color: var(--plano-line);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(31, 36, 48, 0.05), 0 10px 30px rgba(31, 36, 48, 0.06);
+}
+
+.plano-page .card-header {
+  padding: 1.15rem 1.25rem 0.75rem;
+  border-bottom: 1px dashed var(--plano-line);
+}
+
+.plano-page .plano-export-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.plano-page .card-header .export-button {
+  margin-left: 0;
 }
 
 .plano-canvas {
   display: flex;
   justify-content: center;
-  padding: 1rem;
+  margin: 1rem;
+  padding: 1.25rem;
+  background:
+    radial-gradient(circle, rgba(31, 36, 48, 0.055) 1px, transparent 1.2px) 0 0 / 22px 22px,
+    var(--plano-paper);
+  border: 1px solid var(--plano-line);
+  border-radius: 8px;
 }
 
 .plano-canvas svg {
   width: 100%;
   height: auto;
-  max-width: 500px;
-  max-height: 500px;
+  max-width: 460px;
+  max-height: 460px;
 }
 
 .plano-card-state {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 250px;
-  color: #dc2626;
-  font-style: italic;
+  gap: 0.75rem;
+  min-height: 320px;
+  margin: 1rem;
   padding: 2rem;
   text-align: center;
+  color: #b91c1c;
+  background: var(--plano-paper);
+  border: 1px dashed #f3c1c1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.plano-state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-weight: 700;
+  font-family: var(--plano-mono);
+}
+
+.plano-presets {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.plano-preset-btn {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--plano-line);
+  border-radius: 6px;
+  background: white;
+  color: var(--plano-ink);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+}
+
+.plano-preset-btn:hover {
+  border-color: var(--plano-accent);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.14);
+}
+
+.plano-preset-btn:active {
+  transform: translateY(1px);
+}
+
+.plano-preset-btn:focus-visible {
+  outline: 2px solid var(--plano-accent);
+  outline-offset: 2px;
+}
+
+.color-options {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.color-option {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  background: var(--swatch);
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.12s;
+}
+
+.color-option:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 2px var(--plano-line);
+}
+
+.color-option:active {
+  transform: scale(0.92);
+}
+
+.color-option-check {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.15s, transform 0.18s;
+}
+
+.color-option.selected .color-option-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.color-option:focus-visible {
+  outline: 2px solid var(--plano-accent);
+  outline-offset: 2px;
+}
+
+.thickness-option {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.thickness-dot {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #333;
+  transition: background 0.15s, transform 0.12s;
+}
+
+.thickness-option:hover .thickness-dot {
+  transform: scale(1.08);
+}
+
+.thickness-option.selected .thickness-dot {
+  background: #2563eb;
+}
+
+.thickness-option:focus-visible .thickness-dot {
+  outline: 2px solid var(--plano-accent);
+  outline-offset: 2px;
+}
+
+.thickness-label {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: #333;
+  line-height: 1;
+}
+
+.thickness-option.selected .thickness-label {
+  color: #333;
+  font-weight: 600;
+}
+
+/* ── Plano Cartesiano: animaciones ───────────────────── */
+
+.plano-page .plano-presets,
+.plano-page .collapsible-card,
+.plano-page .diagram-section-card {
+  animation: plano-rise 0.4s ease both;
+}
+
+.plano-page .plano-presets {
+  animation-delay: 0s;
+}
+
+.plano-page .collapsible-card:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.plano-page .collapsible-card:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.plano-page .collapsible-card:nth-child(4) {
+  animation-delay: 0.15s;
+}
+
+.plano-page .collapsible-card:nth-child(5) {
+  animation-delay: 0.2s;
+}
+
+.plano-page .diagram-section-card {
+  animation-delay: 0.12s;
+}
+
+@keyframes plano-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plano-page .plano-presets,
+  .plano-page .collapsible-card,
+  .plano-page .diagram-section-card {
+    animation: none;
+  }
+
+  .color-option,
+  .color-option-check,
+  .settings-pill {
+    transition: none;
+  }
 }
 
 .settings-row {
@@ -934,7 +1192,9 @@ body {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #666;
-  margin-top: 0.75rem;
+  border-top: 1px solid var(--plano-line);
+  padding-top: 0.75rem;
+  margin-top: 1rem;
 }
 
 .settings-subtitle:first-child {
@@ -949,6 +1209,91 @@ body {
 .settings-row-control {
   display: flex;
   align-items: center;
+}
+
+.axis-range-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.axis-range-group-head,
+.axis-range-group-fields {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.axis-range-group-head label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #666;
+  text-align: center;
+}
+
+.axis-range-group-fields input {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  text-align: center;
+  transition: border-color 0.15s;
+}
+
+.axis-range-group-fields input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.axis-range-group-fields input::-webkit-outer-spin-button,
+.axis-range-group-fields input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.axis-range-group-fields input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.axis-label-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.axis-label-group-head,
+.axis-label-group-fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.axis-label-group-head label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #666;
+  text-align: center;
+}
+
+.axis-label-group-fields input {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  text-align: center;
+  transition: border-color 0.15s;
+}
+
+.axis-label-group-fields input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
 .number-stepper {
@@ -1045,6 +1390,49 @@ body {
   background: #f5f5f5;
   color: #333;
   cursor: pointer;
+}
+
+.settings-pills {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 999px;
+  background: #f1f3f5;
+}
+
+.settings-pill {
+  flex: 1;
+  white-space: nowrap;
+  padding: 0.25rem 0.55rem;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  color: #333;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.settings-pill:hover:not(.selected) {
+  background: #e2e5ea;
+}
+
+.settings-pill.selected {
+  background: #2563eb;
+  color: #fff;
+  font-weight: 500;
+}
+
+.settings-pill:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.settings-pill-symbol {
+  font-size: 1.05rem;
+  line-height: 1;
+  letter-spacing: 0.06em;
 }
 
 .form-field > input {

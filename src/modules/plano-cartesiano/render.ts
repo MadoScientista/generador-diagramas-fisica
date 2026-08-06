@@ -4,10 +4,10 @@ import type { PlanoCartesianoSettings, AxisSettings } from './types.ts';
 const CANVAS = 500;
 const MARGIN = 56;
 const PLOT = CANVAS - 2 * MARGIN;
-const AXIS_COLOR = '#000';
-const GRID_COLOR = '#d4d4d4';
 const TICK_SIZE = 4;
-const ARROW_SIZE = 6;
+const ARROW_HALF_WIDTH = TICK_SIZE;
+const ARROW_DEPTH = ARROW_HALF_WIDTH * 2;
+const FONT_FAMILY = "'IBM Plex Mono', ui-monospace, 'Courier New', monospace";
 
 export interface RenderResult {
   svg: string | null;
@@ -83,6 +83,12 @@ export function renderPlanoCartesiano(settings: PlanoCartesianoSettings): Render
   const x = parsedX;
   const y = parsedY;
 
+  const gridColor = settings.grid.color;
+  const axisColor = settings.axes.color;
+  const labelColor = settings.appearance.labelColor;
+  const labelFontSize = settings.appearance.labelFontSize;
+  const background = settings.appearance.background === 'transparent' ? 'none' : '#ffffff';
+
   const plotLeft = MARGIN;
   const plotTop = MARGIN;
   const plotRight = MARGIN + PLOT;
@@ -108,13 +114,13 @@ export function renderPlanoCartesiano(settings: PlanoCartesianoSettings): Render
       for (const v of x.tickValues) {
         const xPos = toX(v);
         elements.push(
-          `<line x1="${fmt(xPos)}" y1="${plotTop}" x2="${fmt(xPos)}" y2="${plotBottom}" stroke="${GRID_COLOR}" stroke-width="${settings.grid.thickness}"${dash}/>`,
+          `<line x1="${fmt(xPos)}" y1="${plotTop}" x2="${fmt(xPos)}" y2="${plotBottom}" stroke="${gridColor}" stroke-width="${settings.grid.thickness}"${dash}/>`,
         );
       }
       for (const v of y.tickValues) {
         const yPos = toY(v);
         elements.push(
-          `<line x1="${plotLeft}" y1="${fmt(yPos)}" x2="${plotRight}" y2="${fmt(yPos)}" stroke="${GRID_COLOR}" stroke-width="${settings.grid.thickness}"${dash}/>`,
+          `<line x1="${plotLeft}" y1="${fmt(yPos)}" x2="${plotRight}" y2="${fmt(yPos)}" stroke="${gridColor}" stroke-width="${settings.grid.thickness}"${dash}/>`,
         );
       }
     }
@@ -124,7 +130,7 @@ export function renderPlanoCartesiano(settings: PlanoCartesianoSettings): Render
         for (const yv of y.tickValues) {
           const yPos = toY(yv);
           elements.push(
-            `<circle cx="${fmt(xPos)}" cy="${fmt(yPos)}" r="1.5" fill="${GRID_COLOR}" stroke="none"/>`,
+            `<circle cx="${fmt(xPos)}" cy="${fmt(yPos)}" r="1.5" fill="${gridColor}" stroke="none"/>`,
           );
         }
       }
@@ -142,24 +148,24 @@ export function renderPlanoCartesiano(settings: PlanoCartesianoSettings): Render
     for (const v of x.tickValues) {
       const xPos = toX(v);
       ticks.push(
-        `<line x1="${fmt(xPos)}" y1="${axisY - TICK_SIZE}" x2="${fmt(xPos)}" y2="${axisY + TICK_SIZE}" stroke="${AXIS_COLOR}" stroke-width="1"/>`,
+        `<line x1="${fmt(xPos)}" y1="${axisY - TICK_SIZE}" x2="${fmt(xPos)}" y2="${axisY + TICK_SIZE}" stroke="${axisColor}" stroke-width="1"/>`,
       );
       const isZero = Math.abs(v) < 1e-9;
       if (isZero && x.min < 0 && y.min < 0) {
         ticks.push(
-          `<text x="${fmt(axisX - TICK_SIZE - 6)}" y="${fmt(axisY + TICK_SIZE + 14)}" text-anchor="end" font-size="11" fill="${AXIS_COLOR}">${formatValue(v)}</text>`,
+          `<text x="${fmt(axisX - TICK_SIZE - 6)}" y="${fmt(axisY + TICK_SIZE + 14)}" text-anchor="end" font-size="${labelFontSize}" fill="${labelColor}">${formatValue(v)}</text>`,
         );
       } else if (!(isZero && x.min >= 0 && y.min < 0 && yAxisVisible)) {
         ticks.push(
-          `<text x="${fmt(xPos)}" y="${axisY + TICK_SIZE + 14}" text-anchor="middle" font-size="11" fill="${AXIS_COLOR}">${formatValue(v)}</text>`,
+          `<text x="${fmt(xPos)}" y="${axisY + TICK_SIZE + 14}" text-anchor="middle" font-size="${labelFontSize}" fill="${labelColor}">${formatValue(v)}</text>`,
         );
       }
     }
     axisXSvg = `
-  <line x1="${startX}" y1="${fmt(axisY)}" x2="${fmt(endX)}" y2="${fmt(axisY)}" stroke="${AXIS_COLOR}" stroke-width="${axisStrokeWidth}"/>
-  <polygon points="${fmt(endX)},${fmt(axisY)} ${fmt(endX - ARROW_SIZE)},${fmt(axisY - ARROW_SIZE)} ${fmt(endX - ARROW_SIZE)},${fmt(axisY + ARROW_SIZE)}" fill="${AXIS_COLOR}"/>
+  <line x1="${startX}" y1="${fmt(axisY)}" x2="${fmt(endX - ARROW_DEPTH)}" y2="${fmt(axisY)}" stroke="${axisColor}" stroke-width="${axisStrokeWidth}"/>
+  <polygon points="${fmt(endX)},${fmt(axisY)} ${fmt(endX - ARROW_DEPTH)},${fmt(axisY - ARROW_HALF_WIDTH)} ${fmt(endX - ARROW_DEPTH)},${fmt(axisY + ARROW_HALF_WIDTH)}" fill="${axisColor}"/>
   ${ticks.join('\n  ')}
-  <text x="${fmt(Math.min(endX + 12, CANVAS - 20))}" y="${fmt(axisY + TICK_SIZE + 14)}" text-anchor="middle" font-size="13" fill="${AXIS_COLOR}">x (${escapeXml(settings.xAxis.unit)})</text>`;
+  <text x="${fmt(Math.min(endX + 12, CANVAS - 20))}" y="${fmt(axisY + TICK_SIZE + 14)}" text-anchor="middle" font-size="${labelFontSize + 2}" fill="${labelColor}">${escapeXml(settings.xAxis.label)} (${escapeXml(settings.xAxis.unit)})</text>`;
   }
 
   let axisYSvg = '';
@@ -170,27 +176,27 @@ export function renderPlanoCartesiano(settings: PlanoCartesianoSettings): Render
     for (const v of y.tickValues) {
       const yPos = toY(v);
       ticks.push(
-        `<line x1="${axisX - TICK_SIZE}" y1="${fmt(yPos)}" x2="${axisX + TICK_SIZE}" y2="${fmt(yPos)}" stroke="${AXIS_COLOR}" stroke-width="1"/>`,
+        `<line x1="${axisX - TICK_SIZE}" y1="${fmt(yPos)}" x2="${axisX + TICK_SIZE}" y2="${fmt(yPos)}" stroke="${axisColor}" stroke-width="1"/>`,
       );
       const isZero = Math.abs(v) < 1e-9;
       if (!(isZero && x.min < 0 && xAxisVisible)) {
         ticks.push(
-          `<text x="${axisX - TICK_SIZE - 6}" y="${fmt(yPos + 4)}" text-anchor="end" font-size="11" fill="${AXIS_COLOR}">${formatValue(v)}</text>`,
+          `<text x="${axisX - TICK_SIZE - 6}" y="${fmt(yPos + 4)}" text-anchor="end" font-size="${labelFontSize}" fill="${labelColor}">${formatValue(v)}</text>`,
         );
       }
     }
-    const unitLabelX = axisX - ARROW_SIZE - 4;
+    const unitLabelX = axisX - ARROW_HALF_WIDTH - 4;
     const unitLabelY = endY + 4;
     axisYSvg = `
-  <line x1="${fmt(axisX)}" y1="${startY}" x2="${fmt(axisX)}" y2="${fmt(endY)}" stroke="${AXIS_COLOR}" stroke-width="${axisStrokeWidth}"/>
-  <polygon points="${fmt(axisX)},${fmt(endY)} ${fmt(axisX - ARROW_SIZE)},${fmt(endY + ARROW_SIZE)} ${fmt(axisX + ARROW_SIZE)},${fmt(endY + ARROW_SIZE)}" fill="${AXIS_COLOR}"/>
+  <line x1="${fmt(axisX)}" y1="${startY}" x2="${fmt(axisX)}" y2="${fmt(endY + ARROW_DEPTH)}" stroke="${axisColor}" stroke-width="${axisStrokeWidth}"/>
+  <polygon points="${fmt(axisX)},${fmt(endY)} ${fmt(axisX - ARROW_HALF_WIDTH)},${fmt(endY + ARROW_DEPTH)} ${fmt(axisX + ARROW_HALF_WIDTH)},${fmt(endY + ARROW_DEPTH)}" fill="${axisColor}"/>
   ${ticks.join('\n  ')}
-  <text x="${fmt(unitLabelX)}" y="${fmt(unitLabelY)}" text-anchor="end" font-size="13" fill="${AXIS_COLOR}">y (${escapeXml(settings.yAxis.unit)})</text>`;
+  <text x="${fmt(unitLabelX)}" y="${fmt(unitLabelY)}" text-anchor="end" font-size="${labelFontSize + 2}" fill="${labelColor}">${escapeXml(settings.yAxis.label)} (${escapeXml(settings.yAxis.unit)})</text>`;
   }
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CANVAS} ${CANVAS}" width="${CANVAS}" height="${CANVAS}" role="img" aria-label="Plano cartesiano">
-  <style>text { font-family: 'Inter', 'Roboto', sans-serif; }</style>
-  <rect width="${CANVAS}" height="${CANVAS}" fill="white"/>
+  <style>text { font-family: ${FONT_FAMILY}; }</style>
+  <rect width="${CANVAS}" height="${CANVAS}" fill="${background}"/>
   ${gridSvg}
   ${axisXSvg}
   ${axisYSvg}

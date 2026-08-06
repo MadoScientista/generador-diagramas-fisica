@@ -17,7 +17,11 @@ export function usePlanoCartesiano() {
     setSettings(PLANO_CARTESIANO_DEFAULTS);
   }, []);
 
+  const applySettings = useCallback((next: PlanoCartesianoSettings) => {
+    setSettings(next);
+  }, []);
+
   const { svg, error } = useMemo(() => renderPlanoCartesiano(settings), [settings]);
 
-  return { settings, update, reset, svg, error };
+  return { settings, update, reset, applySettings, svg, error };
 }

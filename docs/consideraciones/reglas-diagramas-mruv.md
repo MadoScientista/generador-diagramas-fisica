@@ -241,7 +241,7 @@ No hay botón "Generar Diagrama" global — el motor se ejecuta automáticamente
 
 **Sección derecha (diagrama):** componente `DiagramSection` que contiene:
 
-- **Header fijo (`.card-header`)**: padding `1rem 1rem 0.5rem`, display flex con gap `0.75rem`. Pill de navegación (Diagrama / Gráficos) alineado a la izquierda + botón "Exportar" alineado a la derecha. El botón Exportar usa estilo secundario (`background: transparent`, `border: 1px solid #d4d4d4`, `color: #333`) para no competir con el azul de la navegación principal.
+- **Header fijo (`.card-header`)**: padding `1rem 1rem 0.5rem`, display flex con gap `0.75rem`. Pill de navegación (Diagrama / Gráficos) alineado a la izquierda + botones "Exportar SVG" / "Exportar PNG" alineados a la derecha (contenedor `.export-actions`). Los botones usan estilo secundario (`background: transparent`, `border: 1px solid #d4d4d4`, `color: #333`) para no competir con el azul de la navegación principal.
 - **Cuerpo (`.card-body`)**: contenido variable según la pestaña activa:
   - **Diagrama**: barra de sub-tabs con etiqueta "Vista previa" (no interactiva, `cursor: default`), seguida del SVG renderizado dentro de `.diagram-section-svg` (altura mínima 440px). Estados vacío/error con placeholder centrado.
   - **Gráficos**: barra de sub-tabs interactivos (Posición / Velocidad / Aceleración) alineados a la izquierda con línea horizontal completa bajo ellos. Cada tab usa `role="tab"` con navegación por teclado (ArrowLeft/ArrowRight). El SVG del gráfico se renderiza debajo en `.graph-panel-body` / `.graph-svg-container`.
