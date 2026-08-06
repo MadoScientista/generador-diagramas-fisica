@@ -1,14 +1,14 @@
 import { useState, useCallback } from 'react';
 import { usePlanoCartesiano } from '../hooks/usePlanoCartesiano.ts';
 import { CollapsibleCard } from '../ui/components/shared/CollapsibleCard.tsx';
-import { GridSection, AxesSection, AxisSection } from '../ui/components/form/PlanoCartesianoSettingsSections.tsx';
+import { GeneralSection, AxisSection } from '../ui/components/form/PlanoCartesianoSettingsSections.tsx';
 import { PlanoCartesianoCard } from '../ui/components/diagram/PlanoCartesianoCard.tsx';
 
-type SettingsCard = 'ejes' | 'cuadricula' | 'ejeX' | 'ejeY';
+type SettingsCard = 'general' | 'ejeX' | 'ejeY';
 
 export function PlanoCartesianoGeneratorPage() {
   const { settings, update, svg, error } = usePlanoCartesiano();
-  const [openCard, setOpenCard] = useState<SettingsCard | null>('ejes');
+  const [openCard, setOpenCard] = useState<SettingsCard | null>('general');
 
   const handleToggleCard = useCallback((card: SettingsCard) => {
     setOpenCard((prev) => (prev === card ? null : card));
@@ -17,11 +17,8 @@ export function PlanoCartesianoGeneratorPage() {
   return (
     <div className="generator-page">
       <section className="input-section">
-        <CollapsibleCard title="Ejes" open={openCard === 'ejes'} onToggle={() => handleToggleCard('ejes')}>
-          <AxesSection settings={settings.axes} onChange={update} />
-        </CollapsibleCard>
-        <CollapsibleCard title="Cuadrícula" open={openCard === 'cuadricula'} onToggle={() => handleToggleCard('cuadricula')}>
-          <GridSection settings={settings.grid} onChange={update} />
+        <CollapsibleCard title="General" open={openCard === 'general'} onToggle={() => handleToggleCard('general')}>
+          <GeneralSection axes={settings.axes} grid={settings.grid} onChange={update} />
         </CollapsibleCard>
         <CollapsibleCard title="Eje X" open={openCard === 'ejeX'} onToggle={() => handleToggleCard('ejeX')}>
           <AxisSection axis="xAxis" settings={settings.xAxis} onChange={update} />

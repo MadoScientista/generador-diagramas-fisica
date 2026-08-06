@@ -14,14 +14,14 @@ export const PLANO_CARTESIANO_DEFAULTS: PlanoCartesianoSettings = {
     visible: true,
     min: '-10',
     max: '10',
-    ticks: '10',
+    step: '2',
     unit: 'm',
   },
   yAxis: {
     visible: true,
     min: '-10',
     max: '10',
-    ticks: '10',
+    step: '2',
     unit: 'm',
   },
 };

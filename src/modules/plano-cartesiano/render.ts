@@ -17,12 +17,28 @@ export interface RenderResult {
 interface ParsedAxis {
   min: number;
   max: number;
-  ticks: number;
   step: number;
+  tickValues: number[];
+  pxPerStep: number;
 }
 
 function escapeXml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function computeTicks(min: number, max: number, step: number): number[] {
+  const EPS = 1e-9;
+  const ticks: number[] = [];
+  const push = (v: number) => {
+    if (Math.abs(v) < EPS) v = 0;
+    if (!ticks.some((t) => Math.abs(t - v) < EPS)) ticks.push(v);
+  };
+  const iMin = Math.ceil(min / step - EPS);
+  const iMax = Math.floor(max / step + EPS);
+  for (let i = iMin; i <= iMax; i++) push(i * step);
+  push(min);
+  push(max);
+  return ticks.sort((a, b) => a - b);
 }
 
 function parseAxis(settings: AxisSettings, label: string): ParsedAxis | string {
@@ -37,11 +53,21 @@ function parseAxis(settings: AxisSettings, label: string): ParsedAxis | string {
   if (min >= max) {
     return `El mínimo del eje ${label} debe ser menor que el máximo.`;
   }
-  const ticks = Number(settings.ticks);
-  if (!Number.isInteger(ticks) || ticks < 1) {
-    return `El número de divisiones del eje ${label} debe ser un entero mayor o igual a 1.`;
+  const step = Number(settings.step);
+  if (!Number.isFinite(step) || step <= 0) {
+    return `El paso del eje ${label} debe ser un número mayor que 0.`;
   }
-  return { min, max, ticks, step: (max - min) / ticks };
+  const maxStep = Math.max(Math.abs(min), Math.abs(max));
+  if (step > maxStep) {
+    return `El paso del eje ${label} debe ser menor o igual al mayor valor absoluto entre el mínimo y el máximo (${maxStep}).`;
+  }
+  return {
+    min,
+    max,
+    step,
+    tickValues: computeTicks(min, max, step),
+    pxPerStep: (step / (max - min)) * PLOT,
+  };
 }
 
 function clamp(value: number, lo: number, hi: number): number {
@@ -68,6 +94,9 @@ export function renderPlanoCartesiano(settings: PlanoCartesianoSettings): Render
   const axisX = clamp(toX(0), plotLeft, plotRight);
   const axisY = clamp(toY(0), plotTop, plotBottom);
 
+  const xAxisVisible = settings.axes.visible && settings.xAxis.visible;
+  const yAxisVisible = settings.axes.visible && settings.yAxis.visible;
+
   const fmt = (n: number) => n.toFixed(2);
 
   let gridSvg = '';
@@ -76,24 +105,24 @@ export function renderPlanoCartesiano(settings: PlanoCartesianoSettings): Render
     const dash = settings.grid.style === 'dashed' ? ` stroke-dasharray="6 4"` : '';
     const elements: string[] = [];
     if (drawLines) {
-      for (let k = 0; k <= x.ticks; k++) {
-        const xPos = toX(x.min + k * x.step);
+      for (const v of x.tickValues) {
+        const xPos = toX(v);
         elements.push(
           `<line x1="${fmt(xPos)}" y1="${plotTop}" x2="${fmt(xPos)}" y2="${plotBottom}" stroke="${GRID_COLOR}" stroke-width="${settings.grid.thickness}"${dash}/>`,
         );
       }
-      for (let k = 0; k <= y.ticks; k++) {
-        const yPos = toY(y.min + k * y.step);
+      for (const v of y.tickValues) {
+        const yPos = toY(v);
         elements.push(
           `<line x1="${plotLeft}" y1="${fmt(yPos)}" x2="${plotRight}" y2="${fmt(yPos)}" stroke="${GRID_COLOR}" stroke-width="${settings.grid.thickness}"${dash}/>`,
         );
       }
     }
     if (settings.grid.style === 'dots') {
-      for (let k = 0; k <= x.ticks; k++) {
-        const xPos = toX(x.min + k * x.step);
-        for (let m = 0; m <= y.ticks; m++) {
-          const yPos = toY(y.min + m * y.step);
+      for (const xv of x.tickValues) {
+        const xPos = toX(xv);
+        for (const yv of y.tickValues) {
+          const yPos = toY(yv);
           elements.push(
             `<circle cx="${fmt(xPos)}" cy="${fmt(yPos)}" r="1.5" fill="${GRID_COLOR}" stroke="none"/>`,
           );
@@ -107,11 +136,10 @@ export function renderPlanoCartesiano(settings: PlanoCartesianoSettings): Render
 
   let axisXSvg = '';
   if (settings.axes.visible && settings.xAxis.visible) {
-    const startX = x.min < 0 ? Math.max(plotLeft - PLOT / x.ticks, 4) : plotLeft;
-    const endX = Math.min(plotRight + PLOT / x.ticks, CANVAS - 4);
+    const startX = x.min < 0 ? Math.max(plotLeft - x.pxPerStep, 4) : plotLeft;
+    const endX = Math.min(plotRight + x.pxPerStep, CANVAS - 4);
     const ticks: string[] = [];
-    for (let k = 0; k <= x.ticks; k++) {
-      const v = x.min + k * x.step;
+    for (const v of x.tickValues) {
       const xPos = toX(v);
       ticks.push(
         `<line x1="${fmt(xPos)}" y1="${axisY - TICK_SIZE}" x2="${fmt(xPos)}" y2="${axisY + TICK_SIZE}" stroke="${AXIS_COLOR}" stroke-width="1"/>`,
@@ -121,7 +149,7 @@ export function renderPlanoCartesiano(settings: PlanoCartesianoSettings): Render
         ticks.push(
           `<text x="${fmt(axisX - TICK_SIZE - 6)}" y="${fmt(axisY + TICK_SIZE + 14)}" text-anchor="end" font-size="11" fill="${AXIS_COLOR}">${formatValue(v)}</text>`,
         );
-      } else if (!(isZero && x.min >= 0 && y.min < 0)) {
+      } else if (!(isZero && x.min >= 0 && y.min < 0 && yAxisVisible)) {
         ticks.push(
           `<text x="${fmt(xPos)}" y="${axisY + TICK_SIZE + 14}" text-anchor="middle" font-size="11" fill="${AXIS_COLOR}">${formatValue(v)}</text>`,
         );
@@ -131,22 +159,21 @@ export function renderPlanoCartesiano(settings: PlanoCartesianoSettings): Render
   <line x1="${startX}" y1="${fmt(axisY)}" x2="${fmt(endX)}" y2="${fmt(axisY)}" stroke="${AXIS_COLOR}" stroke-width="${axisStrokeWidth}"/>
   <polygon points="${fmt(endX)},${fmt(axisY)} ${fmt(endX - ARROW_SIZE)},${fmt(axisY - ARROW_SIZE)} ${fmt(endX - ARROW_SIZE)},${fmt(axisY + ARROW_SIZE)}" fill="${AXIS_COLOR}"/>
   ${ticks.join('\n  ')}
-  <text x="${fmt(Math.min(endX, CANVAS - 20))}" y="${fmt(axisY + TICK_SIZE + 14)}" text-anchor="middle" font-size="13" fill="${AXIS_COLOR}">x (${escapeXml(settings.xAxis.unit)})</text>`;
+  <text x="${fmt(Math.min(endX + 12, CANVAS - 20))}" y="${fmt(axisY + TICK_SIZE + 14)}" text-anchor="middle" font-size="13" fill="${AXIS_COLOR}">x (${escapeXml(settings.xAxis.unit)})</text>`;
   }
 
   let axisYSvg = '';
   if (settings.axes.visible && settings.yAxis.visible) {
-    const startY = y.min < 0 ? Math.min(plotBottom + PLOT / y.ticks, CANVAS - 4) : plotBottom;
-    const endY = Math.max(plotTop - PLOT / y.ticks, 4);
+    const startY = y.min < 0 ? Math.min(plotBottom + y.pxPerStep, CANVAS - 4) : plotBottom;
+    const endY = Math.max(plotTop - y.pxPerStep, 4);
     const ticks: string[] = [];
-    for (let k = 0; k <= y.ticks; k++) {
-      const v = y.min + k * y.step;
+    for (const v of y.tickValues) {
       const yPos = toY(v);
       ticks.push(
         `<line x1="${axisX - TICK_SIZE}" y1="${fmt(yPos)}" x2="${axisX + TICK_SIZE}" y2="${fmt(yPos)}" stroke="${AXIS_COLOR}" stroke-width="1"/>`,
       );
       const isZero = Math.abs(v) < 1e-9;
-      if (!(isZero && x.min < 0)) {
+      if (!(isZero && x.min < 0 && xAxisVisible)) {
         ticks.push(
           `<text x="${axisX - TICK_SIZE - 6}" y="${fmt(yPos + 4)}" text-anchor="end" font-size="11" fill="${AXIS_COLOR}">${formatValue(v)}</text>`,
         );

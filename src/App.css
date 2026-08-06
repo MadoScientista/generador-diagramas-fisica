@@ -928,6 +928,19 @@ body {
   gap: 0.5rem;
 }
 
+.settings-subtitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #666;
+  margin-top: 0.75rem;
+}
+
+.settings-subtitle:first-child {
+  margin-top: 0;
+}
+
 .settings-row-label {
   font-size: 0.85rem;
   color: #333;
@@ -938,14 +951,89 @@ body {
   align-items: center;
 }
 
-.settings-input {
-  width: 70px;
-  padding: 0.4rem 0.5rem;
+.number-stepper {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
   border: 1px solid #ccc;
   border-radius: 4px;
-  font-size: 0.85rem;
+  overflow: hidden;
+  background: white;
+}
+
+.number-stepper:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.number-stepper-btn {
+  flex: 0 0 auto;
+  width: 38px;
+  border: none;
+  background: #f5f5f5;
+  color: #333;
+  font-size: 1.05rem;
+  line-height: 1;
   font-family: 'Inter', 'Roboto', sans-serif;
-  text-align: right;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.number-stepper-btn:hover:not(:disabled) {
+  background: #eaeaea;
+}
+
+.number-stepper-btn:disabled {
+  color: #bbb;
+  cursor: not-allowed;
+}
+
+.number-stepper-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+}
+
+.number-stepper input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  border: none;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-radius: 0;
+  padding: 0.5rem 0.25rem;
+  font-size: 1rem;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  text-align: center;
+  color: #1a1a1a;
+}
+
+.number-stepper input:focus {
+  outline: none;
+}
+
+.number-stepper input::-webkit-outer-spin-button,
+.number-stepper input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.number-stepper input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.number-stepper--compact {
+  width: 120px;
+}
+
+.number-stepper--compact .number-stepper-btn {
+  width: 30px;
+}
+
+.number-stepper--compact input {
+  padding: 0.4rem 0.25rem;
+  font-size: 0.85rem;
 }
 
 .settings-select {

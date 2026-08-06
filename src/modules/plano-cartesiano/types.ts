@@ -15,7 +15,7 @@ export interface AxisSettings {
   visible: boolean;
   min: string;
   max: string;
-  ticks: string;
+  step: string;
   unit: string;
 }
 
