@@ -428,16 +428,8 @@ body {
   font-size: 0.8rem;
 }
 
-.controls-table.five-columns {
-  grid-template-columns: 40px 1fr 1fr 1fr 1fr;
-}
-
 .controls-row {
   display: contents;
-}
-
-.controls-row-zebra .controls-cell {
-  background-color: #f7f7f7;
 }
 
 .controls-header {
@@ -470,6 +462,95 @@ body {
 .controls-cell input[type='checkbox']:disabled {
   cursor: not-allowed;
   opacity: 0.35;
+}
+
+/* ── MRUV Controls Table (redesigned) ────────────────── */
+
+.controls-table--mruv {
+  grid-template-columns: 60px repeat(4, 1fr);
+}
+
+.controls-table--mruv .controls-cell {
+  padding: 0.35rem 0;
+}
+
+.controls-table--mruv .controls-header .controls-cell {
+  white-space: nowrap;
+}
+
+.controls-table--mruv .controls-row {
+  display: grid;
+  grid-template-columns: inherit;
+  grid-column: 1 / -1;
+}
+
+.controls-table--mruv .controls-row:not(.controls-header):hover .controls-cell {
+  background-color: #f9f9f9;
+}
+
+.controls-table--mruv .controls-header {
+  border-bottom: 1px solid #ddd;
+}
+
+.controls-group-label {
+  grid-column: 1 / -1;
+  padding: 0.5rem 0 0.15rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid #eee;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  color: #888;
+}
+
+.controls-cell.dim {
+  color: #c0c0c0;
+}
+
+/* ── Toggle Switch ───────────────────────────────────── */
+
+.toggle-switch {
+  width: 30px;
+  height: 18px;
+  border-radius: 999px;
+  background: #d1d5db;
+  border: none;
+  position: relative;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.toggle-switch .toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s;
+}
+
+.toggle-switch.on {
+  background: #2563eb;
+}
+
+.toggle-switch.on .toggle-knob {
+  transform: translateX(12px);
+}
+
+.toggle-switch:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.toggle-switch:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }
 
 /* ── Diagram Section ─────────────────────────────────── */
@@ -806,6 +887,92 @@ body {
 .graph-svg-container svg {
   width: 400px;
   height: 400px;
+}
+
+/* ── Plano Cartesiano ────────────────────────────────── */
+
+.plano-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.plano-canvas {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.plano-canvas svg {
+  width: 100%;
+  height: auto;
+  max-width: 500px;
+  max-height: 500px;
+}
+
+.plano-card-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  color: #dc2626;
+  font-style: italic;
+  padding: 2rem;
+  text-align: center;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.settings-row-label {
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.settings-row-control {
+  display: flex;
+  align-items: center;
+}
+
+.settings-input {
+  width: 70px;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  text-align: right;
+}
+
+.settings-select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  background: #f5f5f5;
+  color: #333;
+  cursor: pointer;
+}
+
+.form-field > input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  transition: border-color 0.15s;
+}
+
+.form-field > input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
 /* ── Responsive ──────────────────────────────────────── */

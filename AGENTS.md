@@ -55,7 +55,7 @@ Note: engines are **not** unified yet. They duplicate the pipeline logic with di
 - **Empty/error states:** diagram container uses `height: 250px`.
 - **Label format:** `{identifier} = {value} {unit}` (e.g. `xi = 20 m`). Exception: origin label is `x = 0` (no unit).
 - **Label style:** Inter (Roboto fallback), sans-serif, no italic.
-- **Visibility table:** 3-column pattern (Etiqueta / Valor / Vector). Valor checkbox is disabled when Etiqueta is off. Vector visibility = AND(toggle, physical condition ≠ 0). MRUV adds a 4th column: Móvil (toggles character at xi and/or xf).
+- **Visibility table:** MRU uses the 3-column checkbox pattern (Etiqueta / Valor / Vector); Valor checkbox is disabled when Etiqueta is off. Vector visibility = AND(toggle, physical condition ≠ 0). The MRUV card (`DiagramControlsCardMRUV`) is redesigned: 5 columns (Var / Etiqueta / Valor / Vector / Móvil), `role="switch"` toggles with `aria-label`, rows grouped by physics, "—" cells for non-applicable columns, disabled rows when the physical magnitude is 0 or when vf depends on the xf móvil, and Valor auto-activates Etiqueta. See `docs/consideraciones/estilo-elemento-diagrama.md`.
 - **CollapsibleCard pattern:** header with title + rotating chevron, content hidden via conditional rendering, used for secondary card sections (default closed).
 - **UI flow:** user fills inputs → "Calcular" resolves missing variable → auto-fill → diagram generates → toggles update SVG in real time → "Borrar datos" resets everything to defaults.
 - **Borrar datos:** resets all inputs, units, visibility toggles, character type, and diagram output to their defaults.

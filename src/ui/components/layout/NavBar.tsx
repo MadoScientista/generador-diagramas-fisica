@@ -5,6 +5,7 @@ export function NavBar() {
     <nav className="navbar">
       <NavLink to="/" end>Inicio</NavLink>
       <NavLink to="/generador/mruv">MRUV</NavLink>
+      <NavLink to="/generador/plano-cartesiano">Plano Cartesiano</NavLink>
     </nav>
   );
 }

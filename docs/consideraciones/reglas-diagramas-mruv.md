@@ -23,23 +23,24 @@ Todo diagrama MRUV contiene:
 
 ## 2. Control de visualización de elementos
 
-> El patrón general de la tabla 4 columnas (Símbolo / Valor / Vector / Móvil) está en AGENTS.md > UI Conventions.
+> La tarjeta MRUV usa interruptores `role="switch"` con columnas *Var / Etiqueta / Valor / Vector / Móvil* (diseño en `estilo-elemento-diagrama.md`). La tabla de 4 columnas de MRU v1/v2 no cambia.
 
-Toggles en la tabla dentro del card **"Elementos del diagrama"**:
+Interruptores en la tabla dentro del card **"Elementos del diagrama"**:
 
-| Elemento | Símbolo | Valor | Vector | Móvil |
+| Var | Etiqueta | Valor | Vector | Móvil |
 |----------|----------|-------|--------|-------|
-| $x_i$ | `xi` / `xi = 0 m` | Activo/Inactivo | — | **Activo/Inactivo** |
-| $x_f$ | `xf` / `xf = 50 m` | Activo/Inactivo | — | **Activo/Inactivo** |
-| $v_i$ | `vi` / `vi = 0 m/s` | Activo/Inactivo | Activo/Inactivo | — |
-| $v_f$ | `vf` / `vf = 10 m/s` | Activo/Inactivo | Activo/Inactivo | — |
-| $a$ | `a` / `a = 2 m/s^2` | Activo/Inactivo | Activo/Inactivo | — |
-| $t$ | `t` / `5 s` | Activo/Inactivo | — | — |
-| $\Delta x$ | `Δx` / `Δx = 50 m` | Activo/Inactivo | Activo/Inactivo | — |
+| $x_i$ | Activo/Inactivo | Activo/Inactivo | — | **Activo/Inactivo** |
+| $x_f$ | Activo/Inactivo | Activo/Inactivo | — | **Activo/Inactivo** |
+| $v_i$ | Activo/Inactivo | Activo/Inactivo | Activo/Inactivo | — |
+| $v_f$ | Activo/Inactivo | Activo/Inactivo | Activo/Inactivo | — |
+| $a$ | Activo/Inactivo | Activo/Inactivo | Activo/Inactivo | — |
+| $t$ | Activo/Inactivo | Activo/Inactivo | — | — |
+| $\Delta x$ | Activo/Inactivo | Activo/Inactivo | Activo/Inactivo | — |
 
 Reglas de visibilidad:
 
-- El checkbox **Valor** se deshabilita automáticamente si **Símbolo** está destildado
+- **Etiqueta** controla si el nodo del elemento se dibuja; **Valor** añade `= {valor} {unidad}` a la etiqueta
+- **Valor → Etiqueta**: activar **Valor** con la etiqueta apagada enciende la etiqueta automáticamente; apagar **Etiqueta** apaga **Valor**
 - **Móvil $x_i$**: controla si se muestra el personaje en la posición inicial. Si está desactivado, no se dibuja el cuadrado/personaje en $x_i$
 - **Móvil $x_f$**: controla si se muestra el personaje en la posición final. Si está activado, se dibuja un segundo cuadrado/personaje en $x_f$
 - **Vector $v_i$**: controla el vector de velocidad inicial en $x_i$. La visibilidad final es AND entre el toggle y $v_i \neq 0$
@@ -47,13 +48,20 @@ Reglas de visibilidad:
 - **Vector $a$**: controla la representación de la aceleración. La visibilidad final es AND entre el toggle y $a \neq 0$
 - **Vector $\Delta x$**: controla la flecha de desplazamiento. La visibilidad final es AND entre el toggle y $\Delta x \neq 0$
 
+Estados de fila en la tabla:
+
+- **Magnitud físicamente cero** ($v_i = 0$, $v_f = 0$, $a = 0$, $\Delta x = 0$): los interruptores de la fila se deshabilitan con tooltip `"{id} = 0: este elemento no se dibuja"`
+- **Fila $v_f$ dependiente**: si el móvil $x_f$ está desactivado, los interruptores de $v_f$ se deshabilitan con tooltip `"Activa el móvil de xf para mostrar vf"`
+- **No aplica**: la celda de la columna que el elemento no tiene (Vector en $x_i/x_f/t$, Móvil en $v_i/v_f/a/t/\Delta x$) muestra una raya "—" con `aria-hidden`
+- El estado vacío (< 4 campos llenos) no presenta estados de cero: ningún interruptor se deshabilita por magnitud cero (sin `resolvedValues` no hay `physicalZeros`). La dependencia del móvil $x_f$ sí aplica siempre: la fila $v_f$ queda deshabilitada si el móvil de $x_f$ está desactivado, incluso sin datos
+
 ### 2.1 Dependencias del móvil $x_f$
 
 Cuando el **Móvil $x_f$** está desactivado:
 
 - El **vector $v_f$** se oculta automáticamente
 - La **etiqueta $v_f$** se oculta automáticamente
-- Los checkboxes de $v_f$ (Símbolo, Valor, Vector) se **deshabilitan** visualmente
+- Los interruptores de $v_f$ (Etiqueta, Valor, Vector) se **deshabilitan** visualmente
 
 Al reactivar el móvil $x_f$, el vector y la etiqueta $v_f$ reaparecen según el estado de sus toggles.
 
@@ -115,7 +123,7 @@ Cuando hay menos de 4 campos numéricos llenos, se renderiza solo:
 ### 4.1 Vectores de Velocidad ($v_i$ y $v_f$)
 
 - **$v_i$**: anclado al **borde frontal** del móvil en $x_i$. $v_i > 0$ → flecha desde el borde derecho hacia la derecha. $v_i < 0$ → flecha desde el borde izquierdo hacia la izquierda. $v_i = 0$ → no se dibuja.
-- **$v_f$**: centrado sobre el móvil en $x_f$. La flecha se centra horizontalmente en la posición del móvil. $v_f > 0$ → flecha hacia la derecha. $v_f < 0$ → flecha hacia la izquierda. $v_f = 0$ o móvil $x_f$ oculto → no se dibuja.
+- **$v_f$**: anclado al **borde frontal** del móvil en $x_f$, a la altura del centro del móvil (misma lógica que $v_i$). $v_f > 0$ → flecha desde el borde derecho hacia la derecha. $v_f < 0$ → flecha desde el borde izquierdo hacia la izquierda. $v_f = 0$ o móvil $x_f$ oculto → no se dibuja.
 - La línea termina en la **base del triángulo**, no en la punta.
 - Longitud fija de 80px (no escala con la magnitud de $v$).
 
@@ -140,11 +148,13 @@ Cuando hay menos de 4 campos numéricos llenos, se renderiza solo:
   - Móvil en $x_i$: mira según el signo de $v_i$
     - $v_i > 0$: mira hacia la derecha
     - $v_i < 0$: mira hacia la izquierda
-    - $v_i = 0$ o diagrama base: mirada neutra (sin dirección)
+    - $v_i = 0$: mira hacia la derecha (se trata como positiva; no existe mirada neutra con datos)
   - Móvil en $x_f$: mira según el signo de $v_f$
     - $v_f > 0$: mira hacia la derecha
     - $v_f < 0$: mira hacia la izquierda
-    - $v_f = 0$: mirada neutra
+    - $v_f = 0$: mira hacia la derecha
+  - Diagrama base (sin datos): mirada neutra (sin dirección)
+  - Nota: a nivel de renderizado `right` y `none` son indistinguibles (solo la orientación `left` invierte el sprite); la distinción es semántica.
 - Tipo de personaje configurable: cuadrado, persona, bicicleta, automóvil (mismo patrón que MRU v2)
 
 ---
@@ -161,19 +171,19 @@ Cuando hay menos de 4 campos numéricos llenos, se renderiza solo:
 | $x_i$ | **Sobre el cuadrado** cuando está cerca del origen (< 50px pantalla); debajo del tick en caso contrario. Se etiqueta como **xi** (no x₀) |
 | $x_f$ | **Sobre el cuadrado** cuando está cerca del origen (< 50px), subiendo 18px extra si $x_i$ también está elevado; debajo del tick en caso contrario. Se etiqueta como **xf** |
 | $v_i$ | Encima del vector velocidad inicial, centrado |
-| $v_f$ | Centrada sobre el vector $v_f$, que a su vez está centrado sobre el móvil en $x_f$ |
+| $v_f$ | Encima del vector $v_f$, centrada (misma lógica que la etiqueta $v_i$) |
 | $t$ | Centrado en el eje horizontal principal (`VIEWPORT_WIDTH / 2`), **sobre** la etiqueta $a$ |
 | $a$ | Centrado en el eje horizontal principal (`VIEWPORT_WIDTH / 2`), **debajo** de $t$ y **sobre** el vector aceleración |
 | $\Delta x$ | En el punto medio entre $x_i$ y $x_f$, debajo de la flecha de desplazamiento |
 
 La pila vertical sobre el eje (de arriba hacia abajo) es: $t$ → $a$ → vector $a$ → eje. El offset vertical de $t$ es `AXIS_Y - charH - LABEL_GAP - 78` y el de $a$ es `AXIS_Y - charH - LABEL_GAP - 48`, con una separación de 30px entre ambos. El vector aceleración se ubica en `AXIS_Y - charH - 41`.
 
-Los vectores de velocidad $v_i$ se posicionan a la altura del centro del móvil, mientras que $v_f$ y su etiqueta se posicionan sobre el móvil en $x_f$.
+Los vectores de velocidad $v_i$ y $v_f$ se posicionan a la altura del centro del móvil (`AXIS_Y - charH / 2`); $v_f$ usa la misma lógica de anclaje que $v_i$ (borde frontal del móvil en $x_f$). La etiqueta $v_f$ se posiciona igual que la de $v_i$: desplazada según la dirección del vector y 14px por encima de su línea.
 
 ### 6.2 Control de visibilidad
 
-- **Símbolo**: si está desactivado, el nodo completo se oculta del SVG
-- **Valor**: si está activado, la etiqueta muestra `{id} = {valor} {unidad}`; si no, solo `{id}`. Solo disponible si Símbolo está activo
+- **Etiqueta**: si está desactivado, el nodo completo se oculta del SVG
+- **Valor**: si está activado, la etiqueta muestra `{id} = {valor} {unidad}`; si no, solo `{id}`. Activar **Valor** enciende **Etiqueta** automáticamente
 - **Vector**: controla la visibilidad de $v_i$, $v_f$, $a$ o $\Delta x$. La visibilidad final es AND entre el toggle y la condición física ($v_i \neq 0$, $v_f \neq 0$, $a \neq 0$ o $\Delta x \neq 0$)
 - **Etiqueta $v_f$**: desaparece si el vector $v_f$ no es visible (por toggle desactivado, $v_f = 0$, o móvil $x_f$ oculto)
 
@@ -224,7 +234,7 @@ Las tres tarjetas usan un patrón de **acordeón controlado**: solo una puede es
   - Los placeholders de los campos muestran subíndices con HTML `<sub>` mediante `identToHTML`: `xi` → `x<sub>i</sub>`, `xf` → `x<sub>f</sub>`, `vi` → `v<sub>i</sub>`, `vf` → `v<sub>f</sub>`.
   - Las unidades en el dropdown se renderizan con HTML `<sup>` mediante `displayUnitHTML`: `m/s^2` → `m/s<sup>2</sup>`.
   - El dropdown y el input comparten `font-size: 1rem`, `line-height: normal` y `padding` idéntico para igualar alturas.
-- **Card 2 - "Elementos del diagrama"** (`DiagramControlsCardMRUV`): envuelta en `CollapsibleCard` controlada con `open={openCard === 'elementos'}`. Tabla de controles con 7 filas ($x_i$, $x_f$, $v_i$, $v_f$, $a$, $t$, $\Delta x$). Columnas: *Símbolo*, *Valor*, *Vector*, *Móvil*. Los checkboxes de $v_f$ se deshabilitan cuando el móvil $x_f$ está desactivado. Las filas de datos alternan en modo cebra (fondo `#f7f7f7` en las filas pares vía la clase `.controls-row-zebra`); el encabezado queda sin fondo.
+- **Card 2 - "Elementos del diagrama"** (`DiagramControlsCardMRUV`): envuelta en `CollapsibleCard` controlada con `open={openCard === 'elementos'}`. Tabla de controles con 7 filas agrupadas por física ($x_i$, $x_f$ en **Posición**; $v_i$, $v_f$ en **Velocidad**; $a$ en **Aceleración**; $t$ en **Tiempo**; $\Delta x$ en **Desplazamiento**). Columnas: *Var*, *Etiqueta*, *Valor*, *Vector*, *Móvil*. Interruptores `role="switch"` (clase `.toggle-switch`) con `aria-label` ("Mostrar etiqueta de xi", etc.). Columnas no aplicables muestran raya "—" (`aria-hidden`). **Valor auto-activa Etiqueta** al encenderse; apagar Etiqueta apaga Valor. Los interruptores de una fila se deshabilitan si la magnitud física es 0 ($v_i$, $v_f$, $a$, $\Delta x$; `physicalZeros` calculado desde `resolvedValues`) con tooltip `"{id} = 0: este elemento no se dibuja"`, o si es la fila $v_f$ con el móvil de $x_f$ desactivado (tooltip `"Activa el móvil de xf para mostrar vf"`). Hover en fila + separadores de grupo reemplazan el modo cebra.
 - **Card 3 - "Apariencia del diagrama"** (`DiagramAppearanceCard`): envuelta en `CollapsibleCard` controlada con `open={openCard === 'apariencia'}`. Selector "Movil" (cuadrado, persona, bicicleta, automóvil) y selector "Suelo" (Línea, Pasto, Calle, Playa). El valor de "Suelo" se propaga al motor y es funcional: con la opción "Línea" el móvil toca el eje tal como siempre; con "Pasto", "Calle" o "Playa" el eje principal baja 10 px y en el espacio entre el móvil y el eje se dibuja la banda del suelo seleccionado (verde con briznas, asfalto con línea discontinua, arena con textura respectivamente). Las marcas del eje y las etiquetas/desplazamiento inferiores se desplazan junto con el eje; el móvil y las etiquetas superiores conservan su posición.
 
 No hay botón "Generar Diagrama" global — el motor se ejecuta automáticamente cuando los datos son suficientes.

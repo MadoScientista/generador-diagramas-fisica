@@ -1,6 +1,6 @@
 # Plan: Rediseño de la tarjeta "Elementos del diagrama" (MRUV)
 
-> Documento de planificación. Describe cómo mejorar la usabilidad y el diseño de la tarjeta "Elementos del diagrama" del generador MRUV. Este plan se implementa en una iteración futura.
+> Documento que describe el rediseño de la tarjeta "Elementos del diagrama" del generador MRUV. **Ya implementado**: el código actual (`DiagramControlsCardMRUV.tsx`) sigue esta especificación, con las salvedades marcadas en el texto.
 > Alcance: **solo MRUV**. La tarjeta equivalente de MRU v1/v2 (`DiagramControlsCard`) no se modifica.
 
 ---
@@ -31,8 +31,8 @@ La tarjeta actual es una tabla de 5 columnas (`Var | Símbolo | Valor | Vector |
 
 ### 3.1 Semántica y etiquetado (`DiagramControlsCardMRUV.tsx`)
 
-- Headers de la tabla: `Elemento | Etiqueta | Valor | Vector | Móvil` (se eliminan "Var" y "Símbolo" ambiguos).
-- Línea de ayuda arriba de la tabla: **"Marca qué elementos mostrar. Se actualiza al instante."**
+- Headers de la tabla: `Var | Etiqueta | Valor | Vector | Móvil` (se elimina "Símbolo"; se conserva "Var" como nombre de la primera columna).
+- Línea de ayuda arriba de la tabla: **"Marca qué elementos mostrar. Se actualiza al instante."** *(no implementada en el estado actual de la app).*
 - `aria-label` en cada toggle: "Mostrar etiqueta de xi", "Mostrar valor de xi", "Mostrar vector de vi", "Mostrar móvil en xf", etc.
 
 ### 3.2 Interruptores (toggle switch) en vez de checkboxes
@@ -51,7 +51,7 @@ Tres casos visualmente distintos:
 
 | Caso | Cómo se muestra | Tooltip / aria-label |
 |------|-----------------|----------------------|
-| **No aplica** (columna que el elemento no tiene: Móvil en `a/t/dx`, Vector en `xi/xf/t`) | Raya gris "—" (`aria-hidden`), sin toggle | — |
+| **No aplica** (columna que el elemento no tiene: Móvil en `vi/vf/a/t/dx`, Vector en `xi/xf/t`) | Raya gris "—" (`aria-hidden`), sin toggle | — |
 | **Físicamente cero** (`vi`, `vf`, `a`, `dx` = 0) | Toggles deshabilitados (gris apagado) | "a = 0: este elemento no se dibuja" |
 | **Fila vf dependiente** (móvil de `xf` off) | Toggles deshabilitados | "Activa el móvil de xf para mostrar vf" |
 

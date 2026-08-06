@@ -1,60 +1,95 @@
+import { Fragment } from 'react';
 import type { DiagramControls, ElementControls } from '../../../modules/mruv/types.ts';
 import { identToHTML } from '../../../core/format.ts';
+import { ToggleSwitch } from '../shared/ToggleSwitch.tsx';
 
-interface ControlRowMRUVProps {
+interface PhysicalZeros {
+  vi: boolean;
+  vf: boolean;
+  a: boolean;
+  dx: boolean;
+}
+
+type ControlField = keyof ElementControls | 'showCharacter';
+
+interface ControlRowDef {
   id: keyof DiagramControls;
   label: string;
   hasVector: boolean;
   hasCharacter: boolean;
-  control: ElementControls & { showCharacter?: boolean };
-  onControlChange: (element: keyof DiagramControls, field: keyof ElementControls | 'showCharacter', value: boolean) => void;
-  disabled?: boolean;
-  index?: number;
+  zeroKey?: keyof PhysicalZeros;
 }
 
-function ControlRowMRUV({ id, label, hasVector, hasCharacter, control, onControlChange, disabled, index }: ControlRowMRUVProps) {
-  const showValueDisabled = !control.showLabel || disabled;
-  const richLabel = identToHTML(label) ?? label;
+interface ControlRowMRUVProps {
+  row: ControlRowDef;
+  control: ElementControls & { showCharacter?: boolean };
+  onControlChange: (element: keyof DiagramControls, field: ControlField, value: boolean) => void;
+  disabled?: boolean;
+  reason?: string;
+}
+
+function ControlRowMRUV({ row, control, onControlChange, disabled, reason }: ControlRowMRUVProps) {
+  const richLabel = identToHTML(row.label) ?? row.label;
+  const showVector = 'showVector' in control ? (control as ElementControls & { showVector: boolean }).showVector : false;
+
+  const toggleLabel = (value: boolean) => {
+    onControlChange(row.id, 'showLabel', value);
+    if (!value && control.showValue) onControlChange(row.id, 'showValue', false);
+  };
+
+  const toggleValue = (value: boolean) => {
+    if (value && !control.showLabel) onControlChange(row.id, 'showLabel', true);
+    onControlChange(row.id, 'showValue', value);
+  };
 
   return (
-    <div className={index !== undefined && index % 2 === 1 ? 'controls-row controls-row-zebra' : 'controls-row'}>
+    <div className="controls-row">
       <span className="controls-cell element-label">
         <span className="element-symbol" dangerouslySetInnerHTML={{ __html: richLabel }} />
       </span>
       <span className="controls-cell">
-        <input
-          type="checkbox"
+        <ToggleSwitch
           checked={control.showLabel}
           disabled={disabled}
-          onChange={() => onControlChange(id, 'showLabel', !control.showLabel)}
+          label={`Mostrar etiqueta de ${row.label}`}
+          title={reason}
+          onChange={() => toggleLabel(!control.showLabel)}
         />
       </span>
       <span className="controls-cell">
-        <input
-          type="checkbox"
-          checked={control.showValue && control.showLabel}
-          disabled={showValueDisabled}
-          onChange={() => onControlChange(id, 'showValue', !control.showValue)}
+        <ToggleSwitch
+          checked={control.showValue}
+          disabled={disabled}
+          label={`Mostrar valor de ${row.label}`}
+          title={reason}
+          onChange={() => toggleValue(!control.showValue)}
         />
       </span>
       <span className="controls-cell">
-        {hasVector ? (
-          <input
-            type="checkbox"
-            checked={'showVector' in control ? (control as ElementControls & { showVector: boolean }).showVector : false}
+        {row.hasVector ? (
+          <ToggleSwitch
+            checked={showVector}
             disabled={disabled}
-            onChange={() => onControlChange(id, 'showVector', !('showVector' in control ? (control as ElementControls & { showVector: boolean }).showVector : false))}
+            label={`Mostrar vector de ${row.label}`}
+            title={reason}
+            onChange={() => onControlChange(row.id, 'showVector', !showVector)}
           />
-        ) : <input type="checkbox" disabled />}
+        ) : (
+          <span className="controls-cell dim" aria-hidden="true">—</span>
+        )}
       </span>
       <span className="controls-cell">
-        {hasCharacter ? (
-          <input
-            type="checkbox"
+        {row.hasCharacter ? (
+          <ToggleSwitch
             checked={control.showCharacter ?? false}
-            onChange={() => onControlChange(id, 'showCharacter', !(control.showCharacter ?? false))}
+            disabled={disabled}
+            label={`Mostrar móvil en ${row.label}`}
+            title={reason}
+            onChange={() => onControlChange(row.id, 'showCharacter', !(control.showCharacter ?? false))}
           />
-        ) : <input type="checkbox" disabled />}
+        ) : (
+          <span className="controls-cell dim" aria-hidden="true">—</span>
+        )}
       </span>
     </div>
   );
@@ -62,42 +97,74 @@ function ControlRowMRUV({ id, label, hasVector, hasCharacter, control, onControl
 
 interface DiagramControlsCardMRUVProps {
   controls: DiagramControls;
-  onControlChange: (element: keyof DiagramControls, field: keyof ElementControls | 'showCharacter', value: boolean) => void;
+  onControlChange: (element: keyof DiagramControls, field: ControlField, value: boolean) => void;
+  physicalZeros?: PhysicalZeros;
   showTitle?: boolean;
 }
 
-const CONTROL_ROWS: Array<{ id: keyof DiagramControls; label: string; hasVector: boolean; hasCharacter: boolean }> = [
-  { id: 'xi', label: 'xi', hasVector: false, hasCharacter: true },
-  { id: 'xf', label: 'xf', hasVector: false, hasCharacter: true },
-  { id: 'vi', label: 'vi', hasVector: true, hasCharacter: false },
-  { id: 'vf', label: 'vf', hasVector: true, hasCharacter: false },
-  { id: 'a', label: 'a', hasVector: true, hasCharacter: false },
-  { id: 't', label: 't', hasVector: false, hasCharacter: false },
-  { id: 'dx', label: '\u0394x', hasVector: true, hasCharacter: false },
+const CONTROL_GROUPS: Array<{ title: string; rows: ControlRowDef[] }> = [
+  {
+    title: 'Posición',
+    rows: [
+      { id: 'xi', label: 'xi', hasVector: false, hasCharacter: true },
+      { id: 'xf', label: 'xf', hasVector: false, hasCharacter: true },
+    ],
+  },
+  {
+    title: 'Velocidad',
+    rows: [
+      { id: 'vi', label: 'vi', hasVector: true, hasCharacter: false, zeroKey: 'vi' },
+      { id: 'vf', label: 'vf', hasVector: true, hasCharacter: false, zeroKey: 'vf' },
+    ],
+  },
+  {
+    title: 'Aceleración',
+    rows: [{ id: 'a', label: 'a', hasVector: true, hasCharacter: false, zeroKey: 'a' }],
+  },
+  {
+    title: 'Tiempo',
+    rows: [{ id: 't', label: 't', hasVector: false, hasCharacter: false }],
+  },
+  {
+    title: 'Desplazamiento',
+    rows: [{ id: 'dx', label: '\u0394x', hasVector: true, hasCharacter: false, zeroKey: 'dx' }],
+  },
 ];
 
-export function DiagramControlsCardMRUV({ controls, onControlChange, showTitle = true }: DiagramControlsCardMRUVProps) {
+export function DiagramControlsCardMRUV({ controls, onControlChange, physicalZeros, showTitle = true }: DiagramControlsCardMRUVProps) {
   const table = (
-    <div className="controls-table five-columns">
+    <div className="controls-table controls-table--mruv">
       <div className="controls-row controls-header">
         <span className="controls-cell">Var</span>
-        <span className="controls-cell">Símbolo</span>
+        <span className="controls-cell">Etiqueta</span>
         <span className="controls-cell">Valor</span>
         <span className="controls-cell">Vector</span>
         <span className="controls-cell">Móvil</span>
       </div>
-      {CONTROL_ROWS.map((row, i) => (
-        <ControlRowMRUV
-          key={row.id}
-          id={row.id}
-          label={row.label}
-          hasVector={row.hasVector}
-          hasCharacter={row.hasCharacter}
-          control={controls[row.id]}
-          onControlChange={onControlChange}
-          disabled={row.id === 'vf' && !controls.xf.showCharacter}
-          index={i}
-        />
+      {CONTROL_GROUPS.map((group) => (
+        <Fragment key={group.title}>
+          <span className="controls-group-label">{group.title}</span>
+          {group.rows.map((row) => {
+            const rowZero = row.zeroKey !== undefined && physicalZeros?.[row.zeroKey] === true;
+            const rowDisabled = row.id === 'vf' && !controls.xf.showCharacter;
+            const disabled = rowZero || rowDisabled;
+            const reason = rowZero
+              ? `${row.label} = 0: este elemento no se dibuja`
+              : rowDisabled
+                ? 'Activa el móvil de xf para mostrar vf'
+                : undefined;
+            return (
+              <ControlRowMRUV
+                key={row.id}
+                row={row}
+                control={controls[row.id]}
+                onControlChange={onControlChange}
+                disabled={disabled}
+                reason={reason}
+              />
+            );
+          })}
+        </Fragment>
       ))}
     </div>
   );

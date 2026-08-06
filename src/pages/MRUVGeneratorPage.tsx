@@ -46,6 +46,16 @@ export function MRUVGeneratorPage() {
     clearAll,
   } = useMRUVDiagram(controls, character, ground);
 
+  const physicalZeros = useMemo(() => {
+    if (!resolvedValues) return undefined;
+    return {
+      vi: resolvedValues.vi === 0,
+      vf: resolvedValues.vf === 0,
+      a: resolvedValues.a === 0,
+      dx: resolvedValues.dx === 0,
+    };
+  }, [resolvedValues]);
+
   const graphData = useMemo(() => {
     if (!resolvedValues) return null;
     const si = {
@@ -103,6 +113,7 @@ export function MRUVGeneratorPage() {
           <DiagramControlsCardMRUV
             controls={controls}
             onControlChange={handleControlChange}
+            physicalZeros={physicalZeros}
             showTitle={false}
           />
         </CollapsibleCard>
