@@ -90,7 +90,7 @@ export function MRUVGeneratorPage() {
   };
 
   return (
-    <div className="generator-page">
+    <div className="generator-page mruv-page">
       <section className="input-section">
         <CollapsibleCard title="Datos del diagrama" open={openCard === 'datos'} onToggle={() => handleToggleCard('datos')}>
           <DiagramDataCardMRUV

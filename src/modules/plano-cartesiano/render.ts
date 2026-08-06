@@ -151,7 +151,7 @@ export function renderPlanoCartesiano(settings: PlanoCartesianoSettings): Render
         `<line x1="${fmt(xPos)}" y1="${axisY - TICK_SIZE}" x2="${fmt(xPos)}" y2="${axisY + TICK_SIZE}" stroke="${axisColor}" stroke-width="1"/>`,
       );
       const isZero = Math.abs(v) < 1e-9;
-      if (isZero && x.min < 0 && y.min < 0) {
+      if (isZero && x.min < 0 && y.min < 0 && yAxisVisible) {
         ticks.push(
           `<text x="${fmt(axisX - TICK_SIZE - 6)}" y="${fmt(axisY + TICK_SIZE + 14)}" text-anchor="end" font-size="${labelFontSize}" fill="${labelColor}">${formatValue(v)}</text>`,
         );

@@ -223,7 +223,9 @@ Cuando $x_i$ o $x_f$ están a menos de 50px en pantalla del origen:
 
 ### 9.1 Estructura
 
-La página del generador MRUV sigue la misma estructura de MRU v2:
+La página del generador MRUV usa la clase de alcance `mruv-page` en su raíz
+(`<div className="generator-page mruv-page">`), que le aplica la estética "cuaderno" del plano
+cartesiano mediante los tokens `--plano-*` (§9.1.1). La disposición es de dos columnas:
 
 **Sección izquierda (formulario):** cards con formulario usando CSS Grid (`grid-template-columns: 320px 1fr`).
 
@@ -241,14 +243,22 @@ No hay botón "Generar Diagrama" global — el motor se ejecuta automáticamente
 
 **Sección derecha (diagrama):** componente `DiagramSection` que contiene:
 
-- **Header fijo (`.card-header`)**: padding `1rem 1rem 0.5rem`, display flex con gap `0.75rem`. Pill de navegación (Diagrama / Gráficos) alineado a la izquierda + botones "Exportar SVG" / "Exportar PNG" alineados a la derecha (contenedor `.export-actions`). Los botones usan estilo secundario (`background: transparent`, `border: 1px solid #d4d4d4`, `color: #333`) para no competir con el azul de la navegación principal.
+- **Header fijo (`.card-header`)**: padding `1.15rem 1.25rem 0.75rem` (override de `.mruv-page`), display flex con gap `0.75rem`, **sin borde inferior**. No hay título en el header. Pill de navegación (Diagrama / Gráficos) alineado a la izquierda + botones "Exportar SVG" / "Exportar PNG" alineados a la derecha (contenedor `.export-actions`). Los botones usan estilo secundario (`background: transparent`, `border: 1px solid #d4d4d4`, `color: #333`) para no competir con el azul de la navegación principal.
 - **Cuerpo (`.card-body`)**: contenido variable según la pestaña activa:
-  - **Diagrama**: barra de sub-tabs con etiqueta "Vista previa" (no interactiva, `cursor: default`), seguida del SVG renderizado dentro de `.diagram-section-svg` (altura mínima 440px). Estados vacío/error con placeholder centrado.
-  - **Gráficos**: barra de sub-tabs interactivos (Posición / Velocidad / Aceleración) alineados a la izquierda con línea horizontal completa bajo ellos. Cada tab usa `role="tab"` con navegación por teclado (ArrowLeft/ArrowRight). El SVG del gráfico se renderiza debajo en `.graph-panel-body` / `.graph-svg-container`.
-- **Pill (`.view-switcher-inner`)**: fondo `#f4f3ef`, borde `#e5e3da`, border-radius 999px, padding 3px. Tab activo: fondo blanco + sombra, texto `#1a1a18`. Tab inactivo: texto `#6b6a63`.
+  - **Diagrama**: barra de sub-tabs con etiqueta "Vista previa" (no interactiva, `cursor: default`), seguida del SVG renderizado dentro de `.diagram-section-svg` sobre el **lienzo de papel** (`.diagram-section-body`: fondo `radial-gradient` de puntos al 5.5% sobre `--plano-paper`, borde `var(--plano-line)`, `border-radius: 8px`, margin `1rem`, altura mínima 440px). Estados vacío/error con placeholder centrado estilo "hoja" (ver abajo).
+  - **Gráficos**: barra de sub-tabs interactivos (Posición / Velocidad / Aceleración) alineados a la izquierda con línea horizontal completa bajo ellos. Cada tab usa `role="tab"` con navegación por teclado (ArrowLeft/ArrowRight). El SVG del gráfico se renderiza debajo en `.graph-panel-body` (mismo lienzo de papel, margin y padding `1rem`) / `.graph-svg-container`. Cada gráfico lleva un **fondo blanco** propio (`<rect fill="white">`), por lo que la trama solo se ve alrededor del SVG.
+- **Pill (`.view-switcher-inner`)**: fondo `var(--plano-paper)`, borde `var(--plano-line)`, border-radius 999px, padding 3px. Tab activo: fondo blanco + sombra, texto `#1a1a18`. Tab inactivo: texto `#6b6a63`.
 - **Sub-tabs**: `border-bottom: 1px solid #e5e3da` a lo ancho de la tarjeta. Tabs con `padding: 0.5rem 1.25rem`, texto `#a3a199` (inactivo) / `#1a1a18` con `border-bottom: 2px solid #6b6a63` (activo).
-- **Estados vacío/error**: placeholder con `height: 474px`, texto en itálica, color `#888`.
+- **Estados vacío/error**: placeholder estilo "hoja": fondo `var(--plano-paper)`, `border: 1px dashed var(--plano-line)`, `border-radius: 8px`, `min-height: 440px`, margin `1rem`, texto `#8a8a8a` sin itálica. Vacío: "Ajusta los valores para generar el diagrama". Error: clase adicional `.placeholder-error` → texto `#b91c1c` y borde `#f3c1c1`.
 - **Estiramiento vertical**: la sección derecha usa la clase `diagram-section--stretch` (solo en la página MRUV). La tarjeta del diagrama (`.diagram-section-card`) hace `flex: 1` y el `.diagram-section-body` también crece, de modo que el **borde inferior de la tarjeta calza con el borde inferior de la tarjeta "Apariencia del diagrama"** de la columna izquierda, sin importar qué tarjetas del acordeón estén abiertas.
+
+### 9.1.1 Estética "cuaderno" (`mruv-page`)
+
+Overrides `.mruv-page` en `App.css` que aplican la estética del plano cartesiano (tokens `--plano-*`):
+
+- **Marco de tarjetas** (`.collapsible-card`, `.diagram-section-card`): `border-color: var(--plano-line)`, `border-radius: 10px`, `box-shadow: 0 1px 2px rgba(31,36,48,0.05), 0 10px 30px rgba(31,36,48,0.06)`. El header de las tarjetas colapsables ajusta su radio superior (`10px 10px 0 0`).
+- **Widgets con tokens**: tabla de controles (borde inferior del header `var(--plano-line)`, separadores de grupo y hover de fila sobre `--plano-paper`, etiquetas de grupo en `--plano-ink`), toggles activos `var(--plano-accent)`, bordes de inputs/selects (`--plano-line`), pill del view-switcher `--plano-paper`/`--plano-line`.
+- **Animación de entrada** `plano-rise` (0.4s, `animation-fill-mode: both`): las tarjetas colapsables entran con delays escalonados (0.05 / 0.1 / 0.15s según `nth-child`) y la tarjeta del diagrama a 0.12s. Se desactiva con `prefers-reduced-motion: reduce`. Es independiente de la transición de despliegue del acordeón (§9.4).
 
 ### 9.2 Estilos
 

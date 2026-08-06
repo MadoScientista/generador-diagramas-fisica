@@ -94,6 +94,10 @@ sin actualizarlo explícitamente.)*
 
 - Cada gráfico se renderiza en un SVG de **400px de ancho × 400px de alto**, fijo para los
   tres gráficos (x-t, v-t, a-t) — no varía según el contenido o la densidad de datos.
+- Cada SVG incluye un **fondo blanco** como primer elemento (`<rect width="400" height="400" fill="white" />`),
+  igual que el diagrama principal (`renderer.ts`) y el plano cartesiano. Así el gráfico no deja
+  ver la trama de puntos del lienzo de papel que lo rodea en la página (`shared.ts`).
+
 - Constantes de layout: `MARGIN_LEFT = 110` (eje Y), `MARGIN_BOTTOM = 50`, `RIGHT_PAD = 50`,
   `EDGE_PAD = 10` (punta de la flecha del eje Y en el caso mixto). `Y_TITLE_X = 60` es el
   ancla del título rotado del eje Y.
@@ -129,6 +133,11 @@ Los gráficos están integrados dentro del componente `DiagramSection`, que cont
   "Velocidad", "Aceleración". También navegables con ArrowLeft/ArrowRight.
 - Solo un gráfico es visible a la vez; el activo por defecto es el primero ("Posición").
 - El SVG del gráfico activo se renderiza en `.graph-panel-body` > `.graph-svg-container`.
+- En la página MRUV, `.graph-panel-body` se apoya sobre el **lienzo con trama de puntos** de la
+  estética "cuaderno" (fondo `radial-gradient(circle, rgba(31,36,48,0.055) 1px, transparent 1.2px) 0 0 / 22px 22px`
+  sobre `--plano-paper`, borde `var(--plano-line)`, `border-radius: 8px`, margin y padding `1rem`).
+  Como el SVG del gráfico lleva su propio fondo blanco (`<rect fill="white">`), la trama solo se
+  ve en el margen alrededor del gráfico.
 - Cada sub-tab activo usa `border-bottom: 2px solid #6b6a63`; los inactivos tienen texto
   `#a3a199`.
 
@@ -219,5 +228,6 @@ de inferir una solución de diseño no especificada aquí.
 | API `renderGraph` | `(points: { t; y }[], symbol: 'x' \| 'v' \| 'a', yUnit: string, timeUnit: string, yTitle: string, xTitle: string)` — `t` e `y` llegan **ya convertidos a la unidad de visualización** (los componentes de gráfico aplican `fromSI`); el renderer solo grafica y etiqueta. `yTitle`/`xTitle` se dibujan como títulos de eje dentro del gráfico (`Posición`/`Tiempo`, etc.) |
 | Ticks de ejes | Ambos ejes usan `computeNiceTicks()` con pasos "bonitos" `{1, 2, 2.5, 5, 10} × 10^n`. El algoritmo elige el paso que minimiza el **overshoot** del último tick sobre el máximo de los datos, entre todas las configuraciones con entre **5 y 10 ticks**; a igual overshoot prefiere el paso mayor (menos ticks). Como el nº de ticks puede variar (5–10), la geometría se deriva del nº real devuelto (§2, §6): en el eje X `plotW = 240·(n_t−1)/n_t` y `xSpacing = 240/n_t`; en el eje Y el espaciado es `340/n` (mixto) o `340/(n+1)` (y ≥ 0). El eje horizontal oculta el tick `t = 0` (quedan `n_t − 1` visibles). El `0` siempre cae en el eje vertical. La flecha se dibuja a un paso de ticks del último tick (su punta queda fija en `x = 350`). Fallback (caso degenerado): si ningún paso de 5–10 ticks cubre el rango, se usa una ventana fija de `count` ticks subiendo al siguiente paso "bonito" hasta cubrir el máximo |
 | Tamaño SVG | Fijo 400×400 (viewBox, no responsive) |
+| Fondo del SVG | Rectángulo blanco `#ffffff` a pantalla completa (400×400), primer elemento del SVG — mismo patrón que el diagrama principal y el plano cartesiano |
 | Exportación | Botones "Exportar SVG" y "Exportar PNG" en el header de `DiagramSection`. Exportan el elemento activo (diagrama o gráfico según la pestaña seleccionada en el pill). PNG vía `useExportPNG` (canvas, escala 2×, tamaños según viewBox) |
 | Caso a=0 | Mostrar igualmente (curvas lineales/constantes) |

@@ -93,6 +93,7 @@ export function renderGraph(
 
   return `<svg viewBox="0 0 ${WIDTH} ${HEIGHT}" width="${WIDTH}" height="${HEIGHT}" xmlns="http://www.w3.org/2000/svg">
   <style>text { font-family: 'Inter', 'Roboto', sans-serif; font-size: 14px; }</style>
+  <rect width="${WIDTH}" height="${HEIGHT}" fill="white" />
   <line x1="${MARGIN_LEFT}" y1="${axisY0Final}" x2="${arrowEndX}" y2="${axisY0Final}" stroke="${AXIS_COLOR}" stroke-width="1.5"/>
   <polygon points="${arrowEndX},${axisY0Final} ${arrowEndX - 4},${axisY0Final - 4} ${arrowEndX - 4},${axisY0Final + 4}" fill="${AXIS_COLOR}"/>
   <line x1="${MARGIN_LEFT}" y1="${axisLineStartYFinal}" x2="${MARGIN_LEFT}" y2="${arrowEndYFinal}" stroke="${AXIS_COLOR}" stroke-width="1.5"/>
@@ -130,6 +131,7 @@ export function renderEmptyGraph(
 
   return `<svg viewBox="0 0 ${WIDTH} ${HEIGHT}" width="${WIDTH}" height="${HEIGHT}" xmlns="http://www.w3.org/2000/svg">
   <style>text { font-family: 'Inter', 'Roboto', sans-serif; font-size: 14px; }</style>
+  <rect width="${WIDTH}" height="${HEIGHT}" fill="white" />
   <line x1="${MARGIN_LEFT}" y1="${axisY0}" x2="${arrowEndX}" y2="${axisY0}" stroke="${AXIS_COLOR}" stroke-width="1.5"/>
   <polygon points="${arrowEndX},${axisY0} ${arrowEndX - 4},${axisY0 - 4} ${arrowEndX - 4},${axisY0 + 4}" fill="${AXIS_COLOR}"/>
   <line x1="${MARGIN_LEFT}" y1="${axisY0}" x2="${MARGIN_LEFT}" y2="${arrowEndY}" stroke="${AXIS_COLOR}" stroke-width="1.5"/>

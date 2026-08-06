@@ -126,13 +126,13 @@ export function DiagramSection({
               <span className="sub-tab active sub-tab--label">Vista previa</span>
             </div>
             {error ? (
-              <div className="diagram-section-placeholder">
+              <div className="diagram-section-placeholder placeholder-error">
                 <p>{error}</p>
                 {errorDetail && <p className="diagram-error-detail">{errorDetail}</p>}
               </div>
             ) : !svg ? (
               <div className="diagram-section-placeholder">
-                <p>Ingresa los valores y presiona "Generar Diagrama"</p>
+                <p>Ajusta los valores para generar el diagrama</p>
               </div>
             ) : (
               <div className="diagram-section-body">

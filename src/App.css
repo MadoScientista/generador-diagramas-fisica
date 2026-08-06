@@ -912,7 +912,7 @@ body {
 /* ── Plano Cartesiano (rediseño) ─────────────────────── */
 
 .plano-card-title {
-  font-family: var(--plano-mono);
+  font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 1.05rem;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -989,6 +989,97 @@ body {
   font-weight: 700;
   font-family: var(--plano-mono);
 }
+
+/* ── MRUV (estética plano cartesiano) ─────────────────── */
+
+.mruv-page .collapsible-card,
+.mruv-page .diagram-section-card {
+  border-color: var(--plano-line);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(31, 36, 48, 0.05), 0 10px 30px rgba(31, 36, 48, 0.06);
+}
+
+.mruv-page .collapsible-card-header {
+  border-radius: 10px 10px 0 0;
+}
+
+.mruv-page .card-header {
+  padding: 1.15rem 1.25rem 0.75rem;
+}
+
+.mruv-page .diagram-section-body,
+.mruv-page .graph-panel-body {
+  background:
+    radial-gradient(circle, rgba(31, 36, 48, 0.055) 1px, transparent 1.2px) 0 0 / 22px 22px,
+    var(--plano-paper);
+  border: 1px solid var(--plano-line);
+  border-radius: 8px;
+}
+
+.mruv-page .diagram-section-body {
+  margin: 1rem;
+  min-height: 440px;
+}
+
+.mruv-page .graph-panel-body {
+  margin: 1rem;
+  padding: 1rem;
+}
+
+.mruv-page .diagram-section-placeholder {
+  margin: 1rem;
+  height: auto;
+  min-height: 440px;
+  color: #8a8a8a;
+  font-style: normal;
+  background: var(--plano-paper);
+  border: 1px dashed var(--plano-line);
+  border-radius: 8px;
+}
+
+.mruv-page .diagram-section-placeholder.placeholder-error {
+  color: #b91c1c;
+  border-color: #f3c1c1;
+}
+
+.mruv-page .view-switcher-inner {
+  background: var(--plano-paper);
+  border-color: var(--plano-line);
+}
+
+.mruv-page .controls-table--mruv .controls-header {
+  border-bottom-color: var(--plano-line);
+}
+
+.mruv-page .controls-table--mruv .controls-row:not(.controls-header):hover .controls-cell {
+  background-color: var(--plano-paper);
+}
+
+.mruv-page .controls-group-label {
+  border-top-color: var(--plano-line);
+  color: var(--plano-ink);
+  opacity: 0.75;
+}
+
+.mruv-page .toggle-switch.on {
+  background: var(--plano-accent);
+}
+
+.mruv-page .input-with-unit input,
+.mruv-page .unit-select-trigger,
+.mruv-page .appearance-field select {
+  border-color: var(--plano-line);
+}
+
+.mruv-page .collapsible-card,
+.mruv-page .diagram-section-card {
+  animation: plano-rise 0.4s ease both;
+}
+
+.mruv-page .collapsible-card:nth-child(1) { animation-delay: 0.05s; }
+.mruv-page .collapsible-card:nth-child(2) { animation-delay: 0.1s; }
+.mruv-page .collapsible-card:nth-child(3) { animation-delay: 0.15s; }
+.mruv-page .diagram-section-card { animation-delay: 0.12s; }
 
 .plano-presets {
   display: grid;
@@ -1168,7 +1259,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .plano-page .plano-presets,
   .plano-page .collapsible-card,
-  .plano-page .diagram-section-card {
+  .plano-page .diagram-section-card,
+  .mruv-page .collapsible-card,
+  .mruv-page .diagram-section-card {
     animation: none;
   }
 

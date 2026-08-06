@@ -45,7 +45,7 @@ El único stepper numérico con forma `[- input +]` restante es el de tamaño de
 
 - Canvas 500 x 500 pixeles donde se renderiza el plano cartesiano
 - Botones de exportar: **Exportar SVG** (descarga `plano-cartesiano.svg`) y **Exportar PNG** (descarga `plano-cartesiano.png` a 1000×1000, escala 2×)
-- Estética "cuaderno": fondo de papel con trama de puntos sutil, tarjeta con sombra suave, título y números del plano en fuente mono (IBM Plex Mono)
+- Estética "cuaderno": fondo de papel con trama de puntos sutil, tarjeta con sombra suave. El título de la tarjeta usa Inter (como el resto de las tarjetas); los números del plano usan fuente mono (IBM Plex Mono)
 
 > El export PNG es 100% client-side (canvas + `toBlob`, sin dependencias ni backend) por lo que funciona igual en GitHub Pages. Espera `document.fonts.ready` antes de dibujar para incluir IBM Plex Mono. Si el fondo del plano es transparente, el PNG también lo es.
 
@@ -54,7 +54,7 @@ El único stepper numérico con forma `[- input +]` restante es el de tamaño de
 - El plano se re-renderiza en vivo ante cada cambio de ajustes (no hay botón "Calcular").
 - **Colores**: los colores de ejes, cuadrícula y etiquetas son configurables (`settings.axes.color`, `settings.grid.color`, `settings.appearance.labelColor`). Por defecto tinta `#1f2430` y cuadrícula azul "papel milimetrado" `#4a7ab8`.
 - **Fondo**: `appearance.background` es `white` (rect blanco) o `transparent` (rect sin relleno, deja ver la trama de papel del contenedor).
-- **Tipografía**: los números de tick, etiquetas de unidad y el título de la tarjeta usan IBM Plex Mono (`--plano-mono`). El exportado SVG referencia la familia por nombre con fallback a `monospace`.
+- **Tipografía**: los números de tick y las etiquetas de unidad usan IBM Plex Mono (`--plano-mono`). El título de la tarjeta usa Inter, igual que las tarjetas de ajustes. El exportado SVG referencia la familia por nombre con fallback a `monospace`.
 - **Animación**: las tarjetas y presets entran con stagger al cargar la página (sin animación en la re-renderización del plano). Todo respeta `prefers-reduced-motion`.
 - **Ticks** = múltiplos del **Paso** desde 0 dentro del rango `[min, max]`, más el mínimo y el máximo siempre (aunque no sean múltiplos del paso). Ej: Min -10, Max 10, Paso 3 → ticks -10, -9, -6, -3, 0, 3, 6, 9, 10.
 - **Cuadrícula** limitada al rectángulo delimitado por los rangos de los ejes (`[xMin, xMax] × [yMin, yMax]`). Estilo "Puntos" dibuja solo puntos en las intersecciones (sin líneas).
@@ -66,7 +66,7 @@ El único stepper numérico con forma `[- input +]` restante es el de tamaño de
   3. Si `min Y ≥ 0` (y `min X < 0`): solo se renderiza el cero del eje X.
   4. Si `min X ≥ 0` y `min Y ≥ 0`: se renderizan ambos ceros.
 
-  Si un eje individual no es visible (`Eje X` o `Eje Y` desactivado), el otro eje renderiza su propio cero (siempre que 0 esté dentro de su rango): si el eje X no es visible, el eje Y renderiza su 0; si el eje Y no es visible, el eje X renderiza su 0. Si la visibilidad global "Ejes" está desactivada, no se renderiza ningún cero.
+  Si un eje individual no es visible (`Eje X` o `Eje Y` desactivado), el otro eje renderiza su propio cero (siempre que 0 esté dentro de su rango) como una etiqueta de tick normal: si el eje X no es visible, el eje Y renderiza su 0 a la izquierda de su línea; si el eje Y no es visible, el eje X renderiza su 0 centrado bajo su tick. El caso 1 (cero a la izquierda del eje vertical) solo aplica cuando ambos ejes son visibles. Si la visibilidad global "Ejes" está desactivada, no se renderiza ningún cero.
 - **Validación**: Min debe ser menor que Max; Paso debe ser un número mayor que 0 y menor o igual al mayor valor absoluto entre el mínimo y el máximo del eje (ej: min -50, max 20 → paso máximo 50; min -10, max 100 → paso máximo 100). Si falla, se muestra un mensaje de error en español en la tarjeta del plano.
 
 ## Navegación
